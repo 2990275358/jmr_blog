@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="x5-fullscreen" content="true">
+<meta name="full-screen" content="yes">
+<meta name="theme-color" content="#317EFB" />
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=0" name="viewport">
+<meta name="description" content="通过 miniVue 浅析 vue3 核心本文属于学习中的记录，不一定对，miniVue 来源是 codewhy 课堂学习（侵删） 一、了解 vue31、渲染模块vue 中有一个h函数，是用于创建虚拟 DOM 节点（vnode）的,还有一个render函数，是用于编程式地创建组件虚拟 DOM 树的函数，两个函数配合就能替代template的功能，当然render与JSX配合也能实现 12345">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过miniVue浅析vue3核心">
+<meta property="og:url" content="http://example.com/2023/10/02/vue/%E9%80%9A%E8%BF%87miniVue%E6%B5%85%E6%9E%90vue3%E6%A0%B8%E5%BF%83/index.html">
+<meta property="og:site_name" content="王有为的小站">
+<meta property="og:description" content="通过 miniVue 浅析 vue3 核心本文属于学习中的记录，不一定对，miniVue 来源是 codewhy 课堂学习（侵删） 一、了解 vue31、渲染模块vue 中有一个h函数，是用于创建虚拟 DOM 节点（vnode）的,还有一个render函数，是用于编程式地创建组件虚拟 DOM 树的函数，两个函数配合就能替代template的功能，当然render与JSX配合也能实现 12345">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/img/404.jpg">
+<meta property="og:image" content="http://example.com/img/404.jpg">
+<meta property="article:published_time" content="2023-10-02T09:53:20.000Z">
+<meta property="article:modified_time" content="2024-01-01T08:55:08.922Z">
+<meta property="article:author" content="王有为">
+<meta property="article:tag" content="王有为的小站,王有为,前端,我的生活,技术博客">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/404.jpg">
+
+    <meta name="keywords" content="王有为的小站,王有为,前端,我的生活,技术博客">
+
+
+<title >通过miniVue浅析vue3核心</title>
+
+<!-- Favicon -->
+
+    <link href='/img/favicon-16x16.png?v=2.1.2' rel='icon' type='image/png' sizes='16x16' ></link>
+
+
+    <link href='/img/favicon-32x32.png?v=2.1.2' rel='icon' type='image/png' sizes='32x32' ></link>
+
+
+    <link href='/apple-touch-icon.png?v=2.1.2' rel='apple-touch-icon' sizes='180x180' ></link>
+
+
+    <link href='/site.webmanifest' rel='manifest' ></link>
+
+
+<!-- Plugin -->
+
+
+
+
+    
+<link rel="stylesheet" href="/css/plugins/bootstrap.row.css">
+
+    
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@4.0/dist/fancybox.css">
+
+    
+    
+
+
+
+
+<!-- Icon -->
+
+    
+<link rel="stylesheet" href="/css/plugins/font-awesome.min.css">
+
+
+
+
+<!-- Variable -->
+<script>window.ASYNC_CONFIG = {"hostname":"example.com","author":"王有为","root":"/","typed_text":["相信美好的事情即将发生","对世界报之以歌"],"theme_version":"2.1.2","theme":{"switch":true,"default":"style-light"},"favicon":{"logo":"/img/favicon-32x32.png","icon16":"/img/favicon-16x16.png","icon32":"/img/favicon-32x32.png","appleTouchIcon":"apple-touch-icon.png","webmanifest":"/site.webmanifest","visibilitychange":true,"hidden":"/failure.ico","showText":"(/≧▽≦/)咦！又好了！","hideText":"(●—●)喔哟，崩溃啦！"},"i18n":{"placeholder":"搜索文章...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）","author":"本文作者：","copyright_link":"本文链接：","copyright_license_title":"版权声明：","copyright_license_content":"本博客所有文章除特别声明外，均默认采用 undefined 许可协议。","copy_success":"复制成功","copy_failure":"复制失败","open_read_mode":"进入阅读模式","exit_read_mode":"退出阅读模式","notice_outdate_message":"距离上次更新已经 undefined 天了, 文章内容可能已经过时。","just":"刚刚","min":"分钟前","hour":"小时前","day":"天前","month":"个月前"},"swup":false,"plugin":{"flickr_justified_gallery":"https://unpkg.com/flickr-justified-gallery@latest/dist/fjGallery.min.js"},"icons":{"sun":"far fa-sun","moon":"far fa-moon","play":"fas fa-play","email":"far fa-envelope","next":"fas fa-arrow-right","calendar":"far fa-calendar-alt","clock":"far fa-clock","user":"far fa-user","back_top":"fas fa-arrow-up","close":"fas fa-times","search":"fas fa-search","reward":"fas fa-hand-holding-usd","user_tag":"fas fa-user-alt","toc_tag":"fas fa-th-list","read":"fas fa-book-reader","arrows":"fas fa-arrows-alt-h","double_arrows":"fas fa-angle-double-down","copy":"fas fa-copy"},"icontype":"font","highlight":{"plugin":"highlighjs","theme":true,"copy":true,"lang":true,"title":"mac","height_limit":200},"toc":{"post_title":false},"search":{"enable":true,"type":"local","href":"https://www.google.com/search?q=site:","domain":null,"preload":true,"trigger":"auto","path":"search.xml"}};</script>
+<script id="async-page-config">window.PAGE_CONFIG = {"isPost":true,"isHome":false,"postUpdate":"2024-01-01 16:55:08"};</script>
+
+<!-- Theme mode css -->
+<link data-swup-theme rel="stylesheet" href="/css/index.css?v=2.1.2" id="trm-switch-style">
+<script>
+    let defaultMode = ASYNC_CONFIG.theme.default !=='auto' ?  ASYNC_CONFIG.theme.default : (window.matchMedia("(prefers-color-scheme: light)").matches ? 'style-light' : 'style-dark')
+    let catchMode = localStorage.getItem('theme-mode') || defaultMode;
+    let type = catchMode === 'style-dark' ? 'add' : 'remove';
+    document.documentElement.classList[type]('dark')
+</script>
+
+<!-- CDN -->
+
+
+    
+    
+
+
+
+<!-- Site Analytics -->
+ 
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+  <!-- app wrapper -->
+  <div class="trm-app-frame">
+
+    <!-- page preloader -->
+    <div class="trm-preloader">
+    <div class="trm-holder">
+        <div class="preloader">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+</div>
+    <!-- page preloader end -->
+
+    <!-- change mode preloader -->
+    <div class="trm-mode-swich-animation-frame">
+    <div class="trm-mode-swich-animation">
+        <i class="i-sun"><i class="iconfont far fa-sun"></i></i>
+        <div class="trm-horizon"></div>
+        <i class="i-moon"><i class="iconfont far fa-moon"></i></i>
+    </div>
+</div>
+    <!-- change mode preloader end -->
+
+      <!-- scroll container -->
+      <div id="trm-dynamic-content" class="trm-swup-animation">
+        <div id="trm-scroll-container" class="trm-scroll-container" style="opacity: 0">
+            <!-- top bar -->
+            <header class="trm-top-bar">
+	<div class="container">
+		<div class="trm-left-side">
+			<!-- logo -->
+<a href="/" class="trm-logo-frame trm-anima-link">
+    
+        <img alt="logo" src="/img/favicon-32x32.png">
+    
+    
+        <div class="trm-logo-text">
+            Youwei<span>Wang</span>
+        </div>
+    
+</a>
+<!-- logo end -->
+		</div>
+		<div class="trm-right-side">
+			<!-- menu -->
+<div class="trm-menu">
+    <nav>
+        <ul>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/" target="">
+                    首页
+                </a>
+                
+            </li>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/archives/" target="">
+                    档案
+                </a>
+                
+            </li>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/about/" target="">
+                    关于
+                </a>
+                
+            </li>
+            
+        </ul>
+    </nav>
+</div>
+<!-- menu end -->
+			
+    <!-- mode switcher place -->
+    <div class="trm-mode-switcher-place">
+        <div class="trm-mode-switcher">
+            <i class="iconfont far fa-sun"></i>
+            <input class="tgl tgl-light" id="trm-swich" type="checkbox">
+            <label class="trm-swich" for="trm-swich"></label>
+            <i class="iconfont far fa-moon"></i>
+        </div>
+    </div>
+    <!-- mode switcher place end -->
+
+			
+    
+    <div id="trm-search-btn" class="trm-search-btn">
+        <i class="iconfont fas fa-search"></i>
+    </div>
+     
+
+		</div>
+		<div class="trm-menu-btn">
+			<span></span>
+		</div>
+	</div>
+</header>
+            <!-- top bar end -->
+
+            <!-- body -->
+            
+<div class="trm-content-start">
+    <!-- banner -->
+    <div class="trm-banner">
+    
+    <!-- banner cover -->
+    <img style="object-position:top;object-fit:cover;" alt="banner" class="trm-banner-cover" src="/img/bg7.jpg">
+    <!-- banner cover end -->
+    
+
+    <!-- banner content -->
+    <div class="trm-banner-content trm-overlay">
+        <div class="container">
+            <div class="row">
+                
+                <div class="col-lg-4"></div>
+                
+                <div class="col-lg-8">
+
+                    <!-- banner title -->
+                    <div class="trm-banner-text ">
+                        <div class="trm-label trm-mb-20">
+                            Hi my new friend!
+                        </div>
+                        <h1 class="trm-mb-30 trm-hsmb-font">
+                            通过miniVue浅析vue3核心
+                        </h1>
+
+                        
+                            <ul class="trm-breadcrumbs trm-label">
+                                <li>
+                                    <a href="/" class="trm-anima-link">Home</a>
+                                </li>
+                                <li>
+                                    <span>
+                                        2023
+                                    </span>
+                                </li>
+                            </ul>
+                        
+                    </div>
+                    <!-- banner title end -->
+
+                    <!-- scroll hint -->
+                    <span id="scroll-triger" class="trm-scroll-hint-frame">
+                        <div class="trm-scroll-hint"></div>
+                        <span class="trm-label">Scroll down</span>
+                    </span>
+                    <!-- scroll hint end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- banner content end -->
+</div>
+    <!-- banner end -->
+    <div class="container">
+        <div class="row">
+            
+                <div class="trm-page-sidebar col-lg-4 hidden-sm">
+                    <!-- main card -->
+                    <div class="trm-main-card-frame trm-sidebar">
+    <div class="trm-main-card"> 
+        <!-- card header -->
+<div class="trm-mc-header">
+    <div class="trm-avatar-frame trm-mb-20">
+        <img alt="Avatar" class="trm-avatar" src="https://img2.baidu.com/it/u=1010239227,3765400123&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500">
+    </div>
+    <h5 class="trm-name trm-mb-15">
+        王有为
+    </h5>
+    
+        <div class="trm-label">
+            
+            <span class="trm-typed-text">
+                <!-- Words for theme.user.typedText -->
+            </span>
+        </div>
+    
+</div>
+<!-- card header end -->
+        <!-- sidebar social -->
+
+<div class="trm-divider trm-mb-40 trm-mt-40"></div>
+<div class="trm-social">
+    
+        <a href="https://github.com/2990275358" title="github" rel="nofollow" target="_blank">
+            <i class="iconfont fab fa-github"></i>
+        </a>
+    
+</div>
+
+<!-- sidebar social end -->
+        <!-- info -->
+<div class="trm-divider trm-mb-40 trm-mt-40"></div>
+<ul class="trm-table trm-mb-20">
+    
+        <li>
+            <div class="trm-label">
+                地址:
+            </div>
+            <div class="trm-label trm-label-light">
+                湖北荆州
+            </div>
+        </li>
+    
+        <li>
+            <div class="trm-label">
+                年龄:
+            </div>
+            <div class="trm-label trm-label-light">
+                18
+            </div>
+        </li>
+    
+</ul>
+<!-- info end -->
+
+        
+    <div class="trm-divider trm-mb-40 trm-mt-40"></div>
+    <!-- action button -->
+    <div class="text-center">
+        <a href="mailto:2990275358@qq.com" class="trm-btn">
+            联系我
+            <i class="iconfont far fa-envelope"></i>
+        </a>
+    </div>
+    <!-- action button end -->
+
+    </div>
+</div>
+                    <!-- main card end -->
+                </div>
+            
+            <div class="trm-page-content col-lg-8">
+                <div id="trm-content" class="trm-content">
+                    <div class="trm-post-info row hidden-sm">
+    <div class="col-sm-4">
+        <div class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-calendar-alt trm-icon"></i><br>
+            10/02
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-clock trm-icon"></i><br>
+            17:53
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div id="post-author" class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-user trm-icon"></i><br>
+            王有为
+        </div>
+    </div>
+</div>
+<div class="trm-card ">
+    <article id="article-container" class="trm-publication">
+    <meta name="referrer" content="no-referrer" />
+
+<h1 id="通过-miniVue-浅析-vue3-核心"><a href="#通过-miniVue-浅析-vue3-核心" class="headerlink" title="通过 miniVue 浅析 vue3 核心"></a>通过 miniVue 浅析 vue3 核心</h1><p>本文属于学习中的记录，不一定对，miniVue 来源是 codewhy 课堂学习（侵删）</p>
+<h2 id="一、了解-vue3"><a href="#一、了解-vue3" class="headerlink" title="一、了解 vue3"></a>一、了解 vue3</h2><h3 id="1、渲染模块"><a href="#1、渲染模块" class="headerlink" title="1、渲染模块"></a>1、渲染模块</h3><p>vue 中有一个<strong>h</strong>函数，是用于创建虚拟 DOM 节点（vnode）的,还有一个<strong>render</strong>函数，是用于编程式地创建组件虚拟 DOM 树的函数，两个函数配合就能替代<strong>template</strong>的功能，当然<strong>render</strong>与<strong>JSX</strong>配合也能实现</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; h &#125; <span class="keyword">from</span> <span class="string">&quot;vue&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="title function_">data</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="attr">msg</span>: <span class="string">&quot;hello&quot;</span>,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="title function_">render</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">h</span>(<span class="string">&quot;div&quot;</span>, <span class="variable language_">this</span>.<span class="property">msg</span>);</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码来自<a target="_blank" rel="noopener" href="https://cn.vuejs.org/guide/extras/render-function.html">vue 官网</a></p>
+<h3 id="2、响应式模块"><a href="#2、响应式模块" class="headerlink" title="2、响应式模块"></a>2、响应式模块</h3><p>我们都知道<strong>vue3</strong>的响应式较于<strong>vue2</strong>的变化是实现响应式的方法不同，<strong>vue2</strong>是使用对象的<strong>defineProperty</strong>实现的，这种方式有几个麻烦的点</p>
+<ul>
+<li>无法监听数组的变化</li>
+<li>必须遍历对象每个属性</li>
+<li>必须深层遍历嵌套的对象</li>
+<li>无法监听对象新增的属性，在 vue2 中是使用**$set**方法来再次监听</li>
+</ul>
+<p>而<strong>vue3</strong>的<strong>proxy</strong>代理就很好的弥补了上面那些缺点，在<strong>vue3</strong>中是使用<strong>reactive</strong>和<strong>ref</strong>方法来生成响应式数据</p>
+<ul>
+<li><p><strong>ref</strong>能够代理所有的数据，但是代理的数据只能通过**.value**的方式拿值，因为数据还有包裹些别的属性</p>
+</li>
+<li><p>reactive 是只能够代理引用数据类型的数据，因为返回的是直接代理的数据，没有再处理和包裹</p>
+</li>
+</ul>
+<p>当然<strong>vue3</strong>还有编译模块和别的，但是要实现<strong>miniVue</strong>知道两个就够了，编译模块比较麻烦</p>
+<h2 id="二、miniVue"><a href="#二、miniVue" class="headerlink" title="二、miniVue"></a>二、miniVue</h2><h3 id="1、h-函数"><a href="#1、h-函数" class="headerlink" title="1、h 函数"></a>1、h 函数</h3><p>我们通过上面的内容知道<strong>h</strong>函数是返回一个虚拟 DOM 节点的（vnode），它有三个参数</p>
+<ul>
+<li><strong>type</strong>标签类型，也可以是组件对象</li>
+<li><strong>props</strong>可选参数，标签上的<strong>attribute</strong>（属性）</li>
+<li><strong>children</strong>可选参数，子节点</li>
+</ul>
+<p>有了这三个参数我们就能生成<strong>vonde</strong>，那什么是<strong>vnode</strong>呢</p>
+<p><img src="https://gitee.com/jiumuri/images/raw/master/PicGo-updata-img/202304040950637.png" alt="image-20230404095057585" loading="lazy" onerror='this.onerror=null;this.src="/img/404.jpg"'></p>
+<p>我们能看到<strong>h</strong>函数返回的是一个对象，对象中有 type、props、children，这样我们自己就可以编写一个<strong>h</strong>函数了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 生成虚拟dom（js对象）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">String</span>&#125; tag 节点类型</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; props 虚拟节点的属性</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">String,Array</span>&#125; children 子节点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">h</span> = (<span class="params">tag, props, children</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    tag,</span><br><span class="line">    props,</span><br><span class="line">    children,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我们这里简化了<strong>h</strong>函数，实际的要比这复杂的多，但用于实现简单功能这就够了</p>
+<h3 id="2、mount-函数"><a href="#2、mount-函数" class="headerlink" title="2、mount 函数"></a>2、mount 函数</h3><p>mount 函数功能是将虚拟 DOM 节点转换成真实 DOM 的，有两个参数<strong>vnode</strong>、<strong>container</strong>（真实的 node）</p>
+<p>由上面实现的<strong>h</strong>函数我们可以知道，<strong>vonde</strong>就是一个对象里面有<strong>tag(<strong>标签)、</strong>props</strong>(属性)、<strong>children</strong>(子节点)这三个属性，通过<strong>tag</strong>我们能够创建一个真实的 DOM 节点，并且将<strong>props</strong>设置成其属性</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; tag, props, children &#125; = vnode;</span><br><span class="line"><span class="comment">// 1.创建真实元素，并且在vnode上保留</span></span><br><span class="line"><span class="keyword">const</span> el = (vnode.<span class="property">el</span> = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(tag));</span><br><span class="line"><span class="comment">// 2.判断props，设置att</span></span><br><span class="line"><span class="keyword">if</span> (props) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> props) &#123;</span><br><span class="line">    <span class="keyword">const</span> value = props[key];</span><br><span class="line">    <span class="keyword">if</span> (key.<span class="title function_">startsWith</span>(<span class="string">&quot;on&quot;</span>)) &#123;</span><br><span class="line">      el.<span class="title function_">addEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), value);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      el.<span class="title function_">setAttribute</span>(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完成了上面的事情，我们得到了一个真实的 node 并成功为其设置了属性，接下来要做的是处理<strong>children</strong>，分两种情况，第一种是字符串，那我们直接将得到的 node 的<strong>textContent</strong>设置成<strong>children</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">el.<span class="property">textContent</span> = children;</span><br></pre></td></tr></table></figure>
+
+<p>如果是一个<strong>vnode</strong>那我们递归调用这个处理<strong>vnode</strong>的 mount,只不过<strong>container</strong>要变成刚得到的 node，由于子节点可以是多个，所以是数组，我们这里遍历数组</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">children.<span class="title function_">forEach</span>(<span class="function">(<span class="params">element</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">mount</span>(element, el);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>最后就是将<strong>node</strong>挂载到 DOM 树上</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">container.<span class="title function_">appendChild</span>(el);</span><br></pre></td></tr></table></figure>
+
+<p>至此 mount 函数的功能就已经完成了，完整代码如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 挂载虚拟节点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; vnode 虚拟节点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; container 真实的dom节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">mount</span> = (<span class="params">vnode, container</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; tag, props, children &#125; = vnode;</span><br><span class="line">  <span class="comment">// 1.创建真实元素，并且在vnode上保留</span></span><br><span class="line">  <span class="keyword">const</span> el = (vnode.<span class="property">el</span> = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(tag));</span><br><span class="line">  <span class="comment">// 2.判断props，设置att</span></span><br><span class="line">  <span class="keyword">if</span> (props) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> props) &#123;</span><br><span class="line">      <span class="keyword">const</span> value = props[key];</span><br><span class="line">      <span class="keyword">if</span> (key.<span class="title function_">startsWith</span>(<span class="string">&quot;on&quot;</span>)) &#123;</span><br><span class="line">        el.<span class="title function_">addEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), value);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        el.<span class="title function_">setAttribute</span>(key, value);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 3.判断children</span></span><br><span class="line">  <span class="keyword">if</span> (children) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> children === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">      el.<span class="property">textContent</span> = children;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      children.<span class="title function_">forEach</span>(<span class="function">(<span class="params">element</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">mount</span>(element, el);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 4.将虚拟dom挂载在真实dom上</span></span><br><span class="line">  container.<span class="title function_">appendChild</span>(el);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/jiumuri/images/raw/master/PicGo-updata-img/202304041250150.png" alt="image-20230404125048086" loading="lazy" onerror='this.onerror=null;this.src="/img/404.jpg"'></p>
+<h3 id="3、patch-函数"><a href="#3、patch-函数" class="headerlink" title="3、patch 函数"></a>3、patch 函数</h3><p>patch 函数的功能是对<strong>diff</strong>算法的简单模拟，主要比对两个虚拟 DOM 节点是否有变化，有变化则更新，主要参数是<strong>oldNode</strong>(旧节点)、<strong>newNode</strong>（新节点）</p>
+<p>1.两个节点的 tag 不一致，这种情况比较简单，直接拿到节点的父节点然后暴力替换就好了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (n1.<span class="property">tag</span> !== n2.<span class="property">tag</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> preEl = el.<span class="property">parentElement</span>;</span><br><span class="line">  preEl.<span class="title function_">removeChild</span>(n1.<span class="property">el</span>);</span><br><span class="line">  <span class="title function_">mount</span>(n2, preEl);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.两个节点一致，那我们就需要先处理 props</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2、处理props</span></span><br><span class="line"><span class="keyword">const</span> oldProps = n1.<span class="property">props</span> || &#123;&#125;;</span><br><span class="line"><span class="keyword">const</span> newProps = n2.<span class="property">props</span> || &#123;&#125;;</span><br><span class="line"><span class="comment">// 2.1 获取所有新的props，与旧的不一致的就添加上</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> newProps) &#123;</span><br><span class="line">  <span class="keyword">const</span> oldValue = oldProps[key];</span><br><span class="line">  <span class="keyword">const</span> newValue = newProps[key];</span><br><span class="line">  <span class="keyword">if</span> (oldValue !== newValue) &#123;</span><br><span class="line">    <span class="comment">// 如果newProps中的属性的值和oldProps中的不一致那么便更新</span></span><br><span class="line">    <span class="keyword">if</span> (key.<span class="title function_">startsWith</span>(<span class="string">&quot;on&quot;</span>)) &#123;</span><br><span class="line">      el.<span class="title function_">removeEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), oldValue); <span class="comment">// js中函数是引用类型，每次声明地址都不一样，所以需要先取消监听</span></span><br><span class="line">      el.<span class="title function_">addEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), newValue);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      el.<span class="title function_">setAttribute</span>(key, newValue);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 2.2删除旧的没有的props</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> oldProps) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!(key <span class="keyword">in</span> newProps)) &#123;</span><br><span class="line">    <span class="comment">// 如果oldProps中有newProps中没有的属性就删除</span></span><br><span class="line">    <span class="keyword">if</span> (key.<span class="title function_">startsWith</span>(<span class="string">&quot;on&quot;</span>)) &#123;</span><br><span class="line">      el.<span class="title function_">removeEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), oldProps[key]);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      el.<span class="title function_">removeAttribute</span>(key);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.接着就是处理<strong>children</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 3、处理children</span></span><br><span class="line"><span class="keyword">const</span> oldChildren = n1.<span class="property">children</span> || [];</span><br><span class="line"><span class="keyword">const</span> newChildren = n2.<span class="property">children</span> || [];</span><br><span class="line"><span class="comment">// 3.1 新的children是字符串时直接替换</span></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> newChildren === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> oldChildren === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">    oldChildren !== newChildren ? (el.<span class="property">textContent</span> = newChildren) : <span class="string">&quot;&quot;</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    el.<span class="property">innerHTML</span> = newChildren;</span><br><span class="line">  &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="comment">// 3.2 新的children是数组</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> oldChildren === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">    el.<span class="property">innerHTML</span> = <span class="string">&quot;&quot;</span>;</span><br><span class="line">    newChildren.<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> <span class="title function_">mount</span>(item, el));</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> commonLength = <span class="title class_">Math</span>.<span class="title function_">min</span>(oldChildren.<span class="property">length</span>, newChildren.<span class="property">length</span>); <span class="comment">// 找到最小的一个长度，处理两个节点相同长度部分的子节点</span></span><br><span class="line">    <span class="comment">// 3.2.2 替换数组长度一致的部分的内容</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; commonLength; i++) &#123;</span><br><span class="line">      <span class="title function_">patch</span>(oldChildren[i], newChildren[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 3.2.3 oldChildren &gt; newChildren</span></span><br><span class="line">    <span class="keyword">if</span> (oldChildren.<span class="property">length</span> &gt; newChildren.<span class="property">length</span>) &#123;</span><br><span class="line">      oldChildren.<span class="title function_">slice</span>(commonLength).<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">        el.<span class="title function_">removeChild</span>(item.<span class="property">el</span>);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 3.2.4 oldChildren &lt; newChildren</span></span><br><span class="line">    <span class="keyword">if</span> (newChildren.<span class="property">length</span> &gt; oldChildren.<span class="property">length</span>) &#123;</span><br><span class="line">      newChildren.<span class="title function_">slice</span>(commonLength).<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">mount</span>(item, el);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码是较为简单的比较，子节点长度一致的部分是利用之前实现的<strong>patch</strong>做一个替换，长度不一致主要就是删除多的，添加新的，当然还有<strong>n1.children</strong>是字符串而<strong>n2.children</strong>是数组的情况也做了单独处理，但实际上还有很多边界情况没有处理，有机会可以继续完善，完整代码如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 对比两个节点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; n1 旧的虚拟节点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; n2 新的虚拟节点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">patch</span> = (<span class="params">n1, n2</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> el = (n2.<span class="property">el</span> = n1.<span class="property">el</span>);</span><br><span class="line">  <span class="comment">// 1、对比tag类型是否一致</span></span><br><span class="line">  <span class="keyword">if</span> (n1.<span class="property">tag</span> !== n2.<span class="property">tag</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> preEl = el.<span class="property">parentElement</span>;</span><br><span class="line">    preEl.<span class="title function_">removeChild</span>(n1.<span class="property">el</span>);</span><br><span class="line">    <span class="title function_">mount</span>(n2, preEl);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 2、处理props</span></span><br><span class="line">  <span class="keyword">const</span> oldProps = n1.<span class="property">props</span> || &#123;&#125;;</span><br><span class="line">  <span class="keyword">const</span> newProps = n2.<span class="property">props</span> || &#123;&#125;;</span><br><span class="line">  <span class="comment">// 2.1 获取所有新的props，与旧的不一致的就添加上</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> newProps) &#123;</span><br><span class="line">    <span class="keyword">const</span> oldValue = oldProps[key];</span><br><span class="line">    <span class="keyword">const</span> newValue = newProps[key];</span><br><span class="line">    <span class="keyword">if</span> (oldValue !== newValue) &#123;</span><br><span class="line">      <span class="keyword">if</span> (key.<span class="title function_">startsWith</span>(<span class="string">&quot;on&quot;</span>)) &#123;</span><br><span class="line">        el.<span class="title function_">removeEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), oldValue);</span><br><span class="line">        el.<span class="title function_">addEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), newValue);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        el.<span class="title function_">setAttribute</span>(key, newValue);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 2.2删除旧的没有的props</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">in</span> oldProps) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!(key <span class="keyword">in</span> newProps)) &#123;</span><br><span class="line">      <span class="keyword">if</span> (key.<span class="title function_">startsWith</span>(<span class="string">&quot;on&quot;</span>)) &#123;</span><br><span class="line">        el.<span class="title function_">removeEventListener</span>(key.<span class="title function_">slice</span>(<span class="number">2</span>).<span class="title function_">toLocaleLowerCase</span>(), oldProps[key]);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        el.<span class="title function_">removeAttribute</span>(key);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 3、处理children</span></span><br><span class="line">  <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span> || [];</span><br><span class="line">  <span class="keyword">const</span> newChildren = n2.<span class="property">children</span> || [];</span><br><span class="line">  <span class="comment">// 3.1 新的children是字符串时直接替换</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> newChildren === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> oldChildren === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">      oldChildren !== newChildren ? (el.<span class="property">textContent</span> = newChildren) : <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      el.<span class="property">innerHTML</span> = newChildren;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 3.2 新的children是数组</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> oldChildren === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">      el.<span class="property">innerHTML</span> = <span class="string">&quot;&quot;</span>;</span><br><span class="line">      newChildren.<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> <span class="title function_">mount</span>(item, el));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> commonLength = <span class="title class_">Math</span>.<span class="title function_">min</span>(oldChildren.<span class="property">length</span>, newChildren.<span class="property">length</span>);</span><br><span class="line">      <span class="comment">// 3.2.2 替换数组长度一致的部分的内容</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; commonLength; i++) &#123;</span><br><span class="line">        <span class="title function_">patch</span>(oldChildren[i], newChildren[i]);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 3.2.3 oldChildren &gt; newChildren</span></span><br><span class="line">      <span class="keyword">if</span> (oldChildren.<span class="property">length</span> &gt; newChildren.<span class="property">length</span>) &#123;</span><br><span class="line">        oldChildren.<span class="title function_">slice</span>(commonLength).<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">          el.<span class="title function_">removeChild</span>(item.<span class="property">el</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 3.2.4 oldChildren &lt; newChildren</span></span><br><span class="line">      <span class="keyword">if</span> (newChildren.<span class="property">length</span> &gt; oldChildren.<span class="property">length</span>) &#123;</span><br><span class="line">        newChildren.<span class="title function_">slice</span>(commonLength).<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="title function_">mount</span>(item, el);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>至此完成了 miniVue 的渲染模块，接下来是响应式的模块，vue 的响应式重要的就在于<strong>依赖收集</strong>，老师的 miniVue 简单的实现了<strong>Dep</strong>类，用来收集依赖，订阅和通知</p>
+<h3 id="4、Dep-类（收集依赖）"><a href="#4、Dep-类（收集依赖）" class="headerlink" title="4、Dep 类（收集依赖）"></a>4、Dep 类（收集依赖）</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> activeEffect = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Dep</span> &#123;</span><br><span class="line">  <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">subscribe</span> = <span class="keyword">new</span> <span class="title class_">Set</span>();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 收集依赖</span></span><br><span class="line">  <span class="title function_">depend</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (activeEffect) &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">subscribe</span>.<span class="title function_">add</span>(activeEffect);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">notify</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">subscribe</span>.<span class="title function_">forEach</span>(<span class="function">(<span class="params">effcet</span>) =&gt;</span> <span class="title function_">effcet</span>());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>5、</p>
+
+</article>
+    
+    
+
+</div>
+<div class="trm-post-next-prev row">
+    <div class="col-lg-12">
+        <!-- title -->
+        <h5 class="trm-title-with-divider">
+            其他文章
+            <span data-number="02"></span>
+        </h5>
+    </div>
+    
+        <div class="col-lg-6">
+    <div class="trm-blog-card trm-scroll-animation">
+        <a href="/2023/10/02/html/HTML5%E6%96%B0%E5%B1%9E%E6%80%A7/" class="trm-cover-frame trm-anima-link">
+            
+            
+                <img alt="cover" class="no-fancybox" src="/img/bg8.jpg">
+            
+        </a>
+        
+        <div class="trm-card-descr">
+            <div class="trm-label trm-category trm-mb-20">
+                <a href=" /categories/html/">
+                    html
+                </a>
+            </div>
+            <h5>
+                <a href="/2023/10/02/html/HTML5%E6%96%B0%E5%B1%9E%E6%80%A7/" class="trm-anima-link">
+                    HTML5新属性
+                </a>
+            </h5>
+            <div class="trm-divider trm-mb-20 trm-mt-20"></div>
+            <ul class="trm-card-data trm-label">
+                <li>23/10/02</li>
+                <li>17:53</li>
+                
+                
+            </ul>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+    
+
+
+
+                    <div class="trm-divider footer-divider"></div>
+
+                    <!-- footer -->
+                    <footer class="trm-scroll-animation">
+
+    
+
+    
+
+    
+        <div class="trm-footer-item">
+            <span>
+                由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v6.3.0
+            </span>
+            <span class="footer-separator" data-separator=" | "></span>
+            <span> 
+                主题 - 
+                <a rel="noopener" href='https://github.com/MaLuns/hexo-theme-async' target='_blank'>Async</a>
+                v2.1.2
+            </span>
+        </div>
+      
+
+     
+
+     
+</footer>
+ 
+                    <!-- footer end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- body end -->
+
+            
+
+    <div id="post-toc" class="trm-post-toc">
+      <div class="trm-post-toc-header">
+        目录导航
+      </div>
+      <div class="trm-post-toc-content">
+        <ol class="trm-toc"><li class="trm-toc-item trm-toc-level-1"><a rel="nofollow" class="trm-toc-link" href="#通过-miniVue-浅析-vue3-核心"><span class="trm-toc-number">1.</span> <span class="trm-toc-text">通过 miniVue 浅析 vue3 核心</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#一、了解-vue3"><span class="trm-toc-number">1.1.</span> <span class="trm-toc-text">一、了解 vue3</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#1、渲染模块"><span class="trm-toc-number">1.1.1.</span> <span class="trm-toc-text">1、渲染模块</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#2、响应式模块"><span class="trm-toc-number">1.1.2.</span> <span class="trm-toc-text">2、响应式模块</span></a></li></ol></li><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#二、miniVue"><span class="trm-toc-number">1.2.</span> <span class="trm-toc-text">二、miniVue</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#1、h-函数"><span class="trm-toc-number">1.2.1.</span> <span class="trm-toc-text">1、h 函数</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#2、mount-函数"><span class="trm-toc-number">1.2.2.</span> <span class="trm-toc-text">2、mount 函数</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#3、patch-函数"><span class="trm-toc-number">1.2.3.</span> <span class="trm-toc-text">3、patch 函数</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#4、Dep-类（收集依赖）"><span class="trm-toc-number">1.2.4.</span> <span class="trm-toc-text">4、Dep 类（收集依赖）</span></a></li></ol></li></ol></li></ol>
+      </div>
+    </div>
+
+            
+<div class="trm-fixed-container">
+    
+        <div class="trm-fixed-btn post-toc-btn" data-title="目录">
+            <i class="iconfont fas fa-th-list"></i>
+        </div>
+    
+    
+        <div class="trm-fixed-btn" data-title="阅读模式" onclick="asyncFun.switchReadMode()">
+            <i class="iconfont fas fa-book-reader"></i>
+        </div>
+    
+    
+    <div id="trm-back-top" class="trm-fixed-btn" data-title="回到顶部">
+        <i class="iconfont fas fa-arrow-up"></i>
+    </div>
+</div>
+        </div>
+      </div>
+      <!-- scroll container end -->
+  </div>
+  <!-- app wrapper end -->
+
+  
+    <div class="trm-search-popup">
+        <div class="trm-search-wrapper">
+            <div class="form trm-search-form">
+                <div class="trm-search-input-icon">
+                    <i class="iconfont fas fa-search"></i>
+                </div>
+                <input class="trm-search-input" type="text" placeholder="搜索文章...">
+                <div class="trm-search-btn-close">
+                    <i class="iconfont fas fa-times"></i>
+                </div>
+            </div>
+            <div class="trm-search-result-container">
+                <div class="trm-search-empty">
+                    请输入关键词进行搜索
+                </div>
+            </div>
+            <div class="trm-search-footer">
+                <div class="trm-search-stats"></div>
+                <ul class="trm-search-commands">
+                    <li>
+                        <kbd class="command-palette-commands-key">
+                            <svg width="15" height="15" aria-label="Escape key" role="img">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.2">
+                                    <path
+                                        d="M13.6167 8.936c-.1065.3583-.6883.962-1.4875.962-.7993 0-1.653-.9165-1.653-2.1258v-.5678c0-1.2548.7896-2.1016 1.653-2.1016.8634 0 1.3601.4778 1.4875 1.0724M9 6c-.1352-.4735-.7506-.9219-1.46-.8972-.7092.0246-1.344.57-1.344 1.2166s.4198.8812 1.3445.9805C8.465 7.3992 8.968 7.9337 9 8.5c.032.5663-.454 1.398-1.4595 1.398C6.6593 9.898 6 9 5.963 8.4851m-1.4748.5368c-.2635.5941-.8099.876-1.5443.876s-1.7073-.6248-1.7073-2.204v-.4603c0-1.0416.721-2.131 1.7073-2.131.9864 0 1.6425 1.031 1.5443 2.2492h-2.956">
+                                    </path>
+                                </g>
+                            </svg>
+                        </kbd>
+                        <span class="command-palette-Label">to close</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+  <!-- Plugin -->
+
+
+
+
+    
+    
+<script src="https://unpkg.com/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+
+    
+
+    
+        <script src="/js/plugins/typing.js?v=2.1.2"></script>
+    
+
+    
+        
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js"></script>
+
+        <script src="/js/plugins/local_search.js?v=2.1.2"></script>
+    
+
+    <!-- 数学公式 -->
+    
+
+    <!-- 评论插件 -->
+    
+        
+
+        
+    
+
+
+
+<!-- CDN -->
+
+
+    
+
+    
+
+    
+
+
+
+
+    <!-- Service Worker -->
+    
+    <!-- baidu push -->
+    
+
+
+<script id="async-script" src="/js/main.js?v=2.1.2"></script>
+
+</body>
+
+</html>

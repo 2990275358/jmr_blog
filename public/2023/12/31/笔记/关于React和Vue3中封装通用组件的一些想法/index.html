@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="x5-fullscreen" content="true">
+<meta name="full-screen" content="yes">
+<meta name="theme-color" content="#317EFB" />
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=0" name="viewport">
+<meta name="description" content="关于 React 和 Vue3 中封装通用组件的一些想法在我们平时开发时不管 React 还是 Vue 都会使用一些 UI 框架来帮助我们快速搭建页面，我们在使用时会习惯对这些 UI 框架做进一步封装，目的是为了：  降低 UI 框架对项目的影响，避免框架组件 API 更改后整个项目都需要变动  提高复用性和易用性，将框架组件必须但基础的配置统一配置  能根据配置生成项目需要的组件   下面我">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于React和Vue3中封装通用组件的一些想法">
+<meta property="og:url" content="http://example.com/2023/12/31/%E7%AC%94%E8%AE%B0/%E5%85%B3%E4%BA%8EReact%E5%92%8CVue3%E4%B8%AD%E5%B0%81%E8%A3%85%E9%80%9A%E7%94%A8%E7%BB%84%E4%BB%B6%E7%9A%84%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95/index.html">
+<meta property="og:site_name" content="王有为的小站">
+<meta property="og:description" content="关于 React 和 Vue3 中封装通用组件的一些想法在我们平时开发时不管 React 还是 Vue 都会使用一些 UI 框架来帮助我们快速搭建页面，我们在使用时会习惯对这些 UI 框架做进一步封装，目的是为了：  降低 UI 框架对项目的影响，避免框架组件 API 更改后整个项目都需要变动  提高复用性和易用性，将框架组件必须但基础的配置统一配置  能根据配置生成项目需要的组件   下面我">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-12-31T03:07:03.000Z">
+<meta property="article:modified_time" content="2024-01-01T08:43:50.034Z">
+<meta property="article:author" content="王有为">
+<meta property="article:tag" content="王有为的小站,王有为,前端,我的生活,技术博客">
+<meta name="twitter:card" content="summary">
+
+    <meta name="keywords" content="vue,react,组件封装">
+
+
+<title >关于React和Vue3中封装通用组件的一些想法</title>
+
+<!-- Favicon -->
+
+    <link href='/img/favicon-16x16.png?v=2.1.2' rel='icon' type='image/png' sizes='16x16' ></link>
+
+
+    <link href='/img/favicon-32x32.png?v=2.1.2' rel='icon' type='image/png' sizes='32x32' ></link>
+
+
+    <link href='/apple-touch-icon.png?v=2.1.2' rel='apple-touch-icon' sizes='180x180' ></link>
+
+
+    <link href='/site.webmanifest' rel='manifest' ></link>
+
+
+<!-- Plugin -->
+
+
+
+
+    
+<link rel="stylesheet" href="/css/plugins/bootstrap.row.css">
+
+    
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@4.0/dist/fancybox.css">
+
+    
+    
+
+
+
+
+<!-- Icon -->
+
+    
+<link rel="stylesheet" href="/css/plugins/font-awesome.min.css">
+
+
+
+
+<!-- Variable -->
+<script>window.ASYNC_CONFIG = {"hostname":"example.com","author":"王有为","root":"/","typed_text":["相信美好的事情即将发生","对世界报之以歌"],"theme_version":"2.1.2","theme":{"switch":true,"default":"style-light"},"favicon":{"logo":"/img/favicon-32x32.png","icon16":"/img/favicon-16x16.png","icon32":"/img/favicon-32x32.png","appleTouchIcon":"apple-touch-icon.png","webmanifest":"/site.webmanifest","visibilitychange":true,"hidden":"/failure.ico","showText":"(/≧▽≦/)咦！又好了！","hideText":"(●—●)喔哟，崩溃啦！"},"i18n":{"placeholder":"搜索文章...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）","author":"本文作者：","copyright_link":"本文链接：","copyright_license_title":"版权声明：","copyright_license_content":"本博客所有文章除特别声明外，均默认采用 undefined 许可协议。","copy_success":"复制成功","copy_failure":"复制失败","open_read_mode":"进入阅读模式","exit_read_mode":"退出阅读模式","notice_outdate_message":"距离上次更新已经 undefined 天了, 文章内容可能已经过时。","just":"刚刚","min":"分钟前","hour":"小时前","day":"天前","month":"个月前"},"swup":false,"plugin":{"flickr_justified_gallery":"https://unpkg.com/flickr-justified-gallery@latest/dist/fjGallery.min.js"},"icons":{"sun":"far fa-sun","moon":"far fa-moon","play":"fas fa-play","email":"far fa-envelope","next":"fas fa-arrow-right","calendar":"far fa-calendar-alt","clock":"far fa-clock","user":"far fa-user","back_top":"fas fa-arrow-up","close":"fas fa-times","search":"fas fa-search","reward":"fas fa-hand-holding-usd","user_tag":"fas fa-user-alt","toc_tag":"fas fa-th-list","read":"fas fa-book-reader","arrows":"fas fa-arrows-alt-h","double_arrows":"fas fa-angle-double-down","copy":"fas fa-copy"},"icontype":"font","highlight":{"plugin":"highlighjs","theme":true,"copy":true,"lang":true,"title":"mac","height_limit":200},"toc":{"post_title":false},"search":{"enable":true,"type":"local","href":"https://www.google.com/search?q=site:","domain":null,"preload":true,"trigger":"auto","path":"search.xml"}};</script>
+<script id="async-page-config">window.PAGE_CONFIG = {"isPost":true,"isHome":false,"postUpdate":"2024-01-01 16:43:50"};</script>
+
+<!-- Theme mode css -->
+<link data-swup-theme rel="stylesheet" href="/css/index.css?v=2.1.2" id="trm-switch-style">
+<script>
+    let defaultMode = ASYNC_CONFIG.theme.default !=='auto' ?  ASYNC_CONFIG.theme.default : (window.matchMedia("(prefers-color-scheme: light)").matches ? 'style-light' : 'style-dark')
+    let catchMode = localStorage.getItem('theme-mode') || defaultMode;
+    let type = catchMode === 'style-dark' ? 'add' : 'remove';
+    document.documentElement.classList[type]('dark')
+</script>
+
+<!-- CDN -->
+
+
+    
+    
+
+
+
+<!-- Site Analytics -->
+ 
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+  <!-- app wrapper -->
+  <div class="trm-app-frame">
+
+    <!-- page preloader -->
+    <div class="trm-preloader">
+    <div class="trm-holder">
+        <div class="preloader">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+</div>
+    <!-- page preloader end -->
+
+    <!-- change mode preloader -->
+    <div class="trm-mode-swich-animation-frame">
+    <div class="trm-mode-swich-animation">
+        <i class="i-sun"><i class="iconfont far fa-sun"></i></i>
+        <div class="trm-horizon"></div>
+        <i class="i-moon"><i class="iconfont far fa-moon"></i></i>
+    </div>
+</div>
+    <!-- change mode preloader end -->
+
+      <!-- scroll container -->
+      <div id="trm-dynamic-content" class="trm-swup-animation">
+        <div id="trm-scroll-container" class="trm-scroll-container" style="opacity: 0">
+            <!-- top bar -->
+            <header class="trm-top-bar">
+	<div class="container">
+		<div class="trm-left-side">
+			<!-- logo -->
+<a href="/" class="trm-logo-frame trm-anima-link">
+    
+        <img alt="logo" src="/img/favicon-32x32.png">
+    
+    
+        <div class="trm-logo-text">
+            Youwei<span>Wang</span>
+        </div>
+    
+</a>
+<!-- logo end -->
+		</div>
+		<div class="trm-right-side">
+			<!-- menu -->
+<div class="trm-menu">
+    <nav>
+        <ul>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/" target="">
+                    首页
+                </a>
+                
+            </li>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/archives/" target="">
+                    档案
+                </a>
+                
+            </li>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/about/" target="">
+                    关于
+                </a>
+                
+            </li>
+            
+        </ul>
+    </nav>
+</div>
+<!-- menu end -->
+			
+    <!-- mode switcher place -->
+    <div class="trm-mode-switcher-place">
+        <div class="trm-mode-switcher">
+            <i class="iconfont far fa-sun"></i>
+            <input class="tgl tgl-light" id="trm-swich" type="checkbox">
+            <label class="trm-swich" for="trm-swich"></label>
+            <i class="iconfont far fa-moon"></i>
+        </div>
+    </div>
+    <!-- mode switcher place end -->
+
+			
+    
+    <div id="trm-search-btn" class="trm-search-btn">
+        <i class="iconfont fas fa-search"></i>
+    </div>
+     
+
+		</div>
+		<div class="trm-menu-btn">
+			<span></span>
+		</div>
+	</div>
+</header>
+            <!-- top bar end -->
+
+            <!-- body -->
+            
+<div class="trm-content-start">
+    <!-- banner -->
+    <div class="trm-banner">
+    
+    <!-- banner cover -->
+    <img style="object-position:top;object-fit:cover;" alt="banner" class="trm-banner-cover" src="/img/bg1.jpg">
+    <!-- banner cover end -->
+    
+
+    <!-- banner content -->
+    <div class="trm-banner-content trm-overlay">
+        <div class="container">
+            <div class="row">
+                
+                <div class="col-lg-4"></div>
+                
+                <div class="col-lg-8">
+
+                    <!-- banner title -->
+                    <div class="trm-banner-text ">
+                        <div class="trm-label trm-mb-20">
+                            Hi my new friend!
+                        </div>
+                        <h1 class="trm-mb-30 trm-hsmb-font">
+                            关于React和Vue3中封装通用组件的一些想法
+                        </h1>
+
+                        
+                            <ul class="trm-breadcrumbs trm-label">
+                                <li>
+                                    <a href="/" class="trm-anima-link">Home</a>
+                                </li>
+                                <li>
+                                    <span>
+                                        2023
+                                    </span>
+                                </li>
+                            </ul>
+                        
+                    </div>
+                    <!-- banner title end -->
+
+                    <!-- scroll hint -->
+                    <span id="scroll-triger" class="trm-scroll-hint-frame">
+                        <div class="trm-scroll-hint"></div>
+                        <span class="trm-label">Scroll down</span>
+                    </span>
+                    <!-- scroll hint end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- banner content end -->
+</div>
+    <!-- banner end -->
+    <div class="container">
+        <div class="row">
+            
+                <div class="trm-page-sidebar col-lg-4 hidden-sm">
+                    <!-- main card -->
+                    <div class="trm-main-card-frame trm-sidebar">
+    <div class="trm-main-card"> 
+        <!-- card header -->
+<div class="trm-mc-header">
+    <div class="trm-avatar-frame trm-mb-20">
+        <img alt="Avatar" class="trm-avatar" src="https://img2.baidu.com/it/u=1010239227,3765400123&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500">
+    </div>
+    <h5 class="trm-name trm-mb-15">
+        王有为
+    </h5>
+    
+        <div class="trm-label">
+            
+            <span class="trm-typed-text">
+                <!-- Words for theme.user.typedText -->
+            </span>
+        </div>
+    
+</div>
+<!-- card header end -->
+        <!-- sidebar social -->
+
+<div class="trm-divider trm-mb-40 trm-mt-40"></div>
+<div class="trm-social">
+    
+        <a href="https://github.com/2990275358" title="github" rel="nofollow" target="_blank">
+            <i class="iconfont fab fa-github"></i>
+        </a>
+    
+</div>
+
+<!-- sidebar social end -->
+        <!-- info -->
+<div class="trm-divider trm-mb-40 trm-mt-40"></div>
+<ul class="trm-table trm-mb-20">
+    
+        <li>
+            <div class="trm-label">
+                地址:
+            </div>
+            <div class="trm-label trm-label-light">
+                湖北荆州
+            </div>
+        </li>
+    
+        <li>
+            <div class="trm-label">
+                年龄:
+            </div>
+            <div class="trm-label trm-label-light">
+                18
+            </div>
+        </li>
+    
+</ul>
+<!-- info end -->
+
+        
+    <div class="trm-divider trm-mb-40 trm-mt-40"></div>
+    <!-- action button -->
+    <div class="text-center">
+        <a href="mailto:2990275358@qq.com" class="trm-btn">
+            联系我
+            <i class="iconfont far fa-envelope"></i>
+        </a>
+    </div>
+    <!-- action button end -->
+
+    </div>
+</div>
+                    <!-- main card end -->
+                </div>
+            
+            <div class="trm-page-content col-lg-8">
+                <div id="trm-content" class="trm-content">
+                    <div class="trm-post-info row hidden-sm">
+    <div class="col-sm-4">
+        <div class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-calendar-alt trm-icon"></i><br>
+            12/31
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-clock trm-icon"></i><br>
+            11:07
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div id="post-author" class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-user trm-icon"></i><br>
+            王有为
+        </div>
+    </div>
+</div>
+<div class="trm-card ">
+    <article id="article-container" class="trm-publication">
+    <meta name="referrer" content="no-referrer" />
+
+<h1 id="关于-React-和-Vue3-中封装通用组件的一些想法"><a href="#关于-React-和-Vue3-中封装通用组件的一些想法" class="headerlink" title="关于 React 和 Vue3 中封装通用组件的一些想法"></a>关于 React 和 Vue3 中封装通用组件的一些想法</h1><p>在我们平时开发时不管 <strong>React</strong> 还是 <strong>Vue</strong> 都会使用一些 <strong>UI</strong> 框架来帮助我们快速搭建页面，我们在使用时会习惯对这些 <strong>UI</strong> 框架做进一步封装，目的是为了：</p>
+<ul>
+<li><p>降低 <strong>UI</strong> 框架对项目的影响，避免框架组件 <strong>API</strong> 更改后整个项目都需要变动</p>
+</li>
+<li><p>提高复用性和易用性，将框架组件必须但基础的配置统一配置</p>
+</li>
+<li><p>能根据配置生成项目需要的组件</p>
+</li>
+</ul>
+<p>下面我以封装一个通用的 <strong>form</strong> 表单为例来讲述我组件封装的思想，仅代表我个人，且是我现阶段想到的方式，也许自己以后会觉得这种方式很蠢也说不一定</p>
+<p>对了，做一些基础说明 <strong>Vue</strong> 的 <strong>UI</strong> 框架使用的是 <strong>Element-Plus</strong>,<strong>React</strong> 中的是 <strong>Ant Design</strong>，其中 <strong>Vue</strong> 未使用 <strong>setup</strong> 语法糖，而是类似 <strong>Options API</strong> 的方式，不过基本思想差别不大</p>
+<h2 id="一、VUE-中封装组件"><a href="#一、VUE-中封装组件" class="headerlink" title="一、VUE 中封装组件"></a>一、VUE 中封装组件</h2><h3 id="1、封装组件"><a href="#1、封装组件" class="headerlink" title="1、封装组件"></a>1、封装组件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;my-form&quot;&gt;</span><br><span class="line">    &lt;el-form :label-width=&quot;labelWidth&quot;&gt;</span><br><span class="line">      &lt;el-row&gt;</span><br><span class="line">        &lt;template v-for=&quot;item in formItems&quot; :key=&quot;item.label&quot;&gt;</span><br><span class="line">          &lt;el-col v-bind=&quot;colLayout&quot;&gt;</span><br><span class="line">            &lt;template v-if=&quot;item.type === &#x27;text&#x27;&quot;&gt;</span><br><span class="line">              &lt;el-form-item</span><br><span class="line">                :label=&quot;item.label&quot;</span><br><span class="line">                v-bind=&quot;item.itemConfig&quot;</span><br><span class="line">                :style=&quot;itemStyle&quot;</span><br><span class="line">              &gt;</span><br><span class="line">                &lt;el-input</span><br><span class="line">                  :placeholder=&quot;item.placeholder&quot;</span><br><span class="line">                  v-model=&quot;modelField[`$&#123;item.field&#125;`]&quot;</span><br><span class="line">                /&gt;</span><br><span class="line">              &lt;/el-form-item&gt;</span><br><span class="line">            &lt;/template&gt;</span><br><span class="line">            &lt;template v-else-if=&quot;item.type === &#x27;date&#x27;&quot;&gt;</span><br><span class="line">              &lt;el-form-item :label=&quot;item.label&quot; :style=&quot;itemStyle&quot;&gt;</span><br><span class="line">                &lt;el-date-picker</span><br><span class="line">                  v-bind=&quot;item.itemConfig&quot;</span><br><span class="line">                  v-model=&quot;modelField[`$&#123;item.field&#125;`]&quot;</span><br><span class="line">                /&gt;</span><br><span class="line">              &lt;/el-form-item&gt;</span><br><span class="line">            &lt;/template&gt;</span><br><span class="line">            &lt;template v-else-if=&quot;item.type === &#x27;select&#x27;&quot;&gt;</span><br><span class="line">              &lt;el-form-item</span><br><span class="line">                :label=&quot;item.label&quot;</span><br><span class="line">                v-bind=&quot;item.itemConfig&quot;</span><br><span class="line">                :style=&quot;itemStyle&quot;</span><br><span class="line">              &gt;</span><br><span class="line">                &lt;el-select</span><br><span class="line">                  style=&quot;width: 100%&quot;</span><br><span class="line">                  :placeholder=&quot;item.placeholder&quot;</span><br><span class="line">                  v-model=&quot;modelField[`$&#123;item.field&#125;`]&quot;</span><br><span class="line">                &gt;</span><br><span class="line">                  &lt;el-option</span><br><span class="line">                    v-for=&quot;option in item.options&quot;</span><br><span class="line">                    :key=&quot;option.value&quot;</span><br><span class="line">                    :value=&quot;option.value&quot;</span><br><span class="line">                    &gt;&#123;&#123; option.label &#125;&#125;&lt;/el-option</span><br><span class="line">                  &gt;</span><br><span class="line">                &lt;/el-select&gt;</span><br><span class="line">              &lt;/el-form-item&gt;</span><br><span class="line">            &lt;/template&gt;</span><br><span class="line">          &lt;/el-col&gt;</span><br><span class="line">        &lt;/template&gt;</span><br><span class="line">      &lt;/el-row&gt;</span><br><span class="line">    &lt;/el-form&gt;</span><br><span class="line">    &lt;slot name=&quot;foot&quot;&gt; &lt;/slot&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot;&gt;</span><br><span class="line">import &#123; defineComponent, PropType, ref, watch &#125; from &quot;vue&quot;;</span><br><span class="line">import &#123; IFormItem &#125; from &quot;../index&quot;;</span><br><span class="line"></span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  props: &#123;</span><br><span class="line">    modelValue: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">    &#125;,</span><br><span class="line">    formItems: &#123;</span><br><span class="line">      type: Array as PropType&lt;IFormItem[]&gt;,</span><br><span class="line">      default: () =&gt; [],</span><br><span class="line">    &#125;,</span><br><span class="line">    itemStyle: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;</span><br><span class="line">        padding: &quot;10px 30px&quot;,</span><br><span class="line">      &#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">    colLayout: &#123;</span><br><span class="line">      type: Object,</span><br><span class="line">      default: () =&gt; (&#123;</span><br><span class="line">        xl: 6,</span><br><span class="line">        lg: 12,</span><br><span class="line">        md: 18,</span><br><span class="line">        sm: 24,</span><br><span class="line">        xs: 24,</span><br><span class="line">      &#125;),</span><br><span class="line">    &#125;,</span><br><span class="line">    labelWidth: &#123;</span><br><span class="line">      type: String,</span><br><span class="line">      default: &quot;100px&quot;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  emits: [&quot;update:modelValue&quot;],</span><br><span class="line">  setup(props, &#123; emit &#125;) &#123;</span><br><span class="line">    const modelField: any = ref(&#123;</span><br><span class="line">      ...props.modelValue,</span><br><span class="line">    &#125;);</span><br><span class="line">    watch(</span><br><span class="line">      modelField,</span><br><span class="line">      (newVal) =&gt; &#123;</span><br><span class="line">        emit(&quot;update:modelValue&quot;, newVal);</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123; deep: true &#125;</span><br><span class="line">    );</span><br><span class="line">    return &#123;</span><br><span class="line">      modelField,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、配置文件"><a href="#2、配置文件" class="headerlink" title="2、配置文件"></a>2、配置文件</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> itemType = <span class="string">&quot;text&quot;</span> | <span class="string">&quot;select&quot;</span> | <span class="string">&quot;date&quot;</span>;</span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">ISelectOption</span> &#123;</span><br><span class="line">  <span class="attr">value</span>: <span class="built_in">string</span> | <span class="built_in">number</span>;</span><br><span class="line">  <span class="attr">label</span>: <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> <span class="title class_">IFormItem</span> &#123;</span><br><span class="line">  <span class="attr">label</span>: <span class="built_in">string</span>;</span><br><span class="line">  <span class="attr">type</span>: itemType;</span><br><span class="line">  <span class="attr">field</span>: <span class="built_in">string</span>;</span><br><span class="line">  placeholder?: <span class="built_in">string</span>;</span><br><span class="line">  options?: <span class="title class_">ISelectOption</span>[];</span><br><span class="line">  itemConfig?: <span class="built_in">any</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> <span class="title class_">IForm</span> &#123;</span><br><span class="line">  <span class="attr">formItems</span>: <span class="title class_">IFormItem</span>[];</span><br><span class="line">  labelWidth?: <span class="built_in">string</span>;</span><br><span class="line">  itemStyle?: <span class="built_in">any</span>;</span><br><span class="line">  colLayout?: <span class="built_in">any</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="attr">fromConfig</span>: <span class="title class_">IForm</span> = &#123;</span><br><span class="line">  <span class="attr">labelWidth</span>: <span class="string">&quot;100px&quot;</span>,</span><br><span class="line">  <span class="attr">formItems</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;text&quot;</span>,</span><br><span class="line">      <span class="attr">label</span>: <span class="string">&quot;商品名&quot;</span>,</span><br><span class="line">      <span class="attr">field</span>: <span class="string">&quot;name&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&quot;date&quot;</span>,</span><br><span class="line">      <span class="attr">label</span>: <span class="string">&quot;更新时间&quot;</span>,</span><br><span class="line">      <span class="attr">field</span>: <span class="string">&quot;updateAt&quot;</span>,</span><br><span class="line">      <span class="attr">itemConfig</span>: &#123;</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&quot;daterange&quot;</span>,</span><br><span class="line">        <span class="attr">startPlaceholder</span>: <span class="string">&quot;开始时间&quot;</span>,</span><br><span class="line">        <span class="attr">endPlaceholder</span>: <span class="string">&quot;结束时间&quot;</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、组件的使用"><a href="#3、组件的使用" class="headerlink" title="3、组件的使用"></a>3、组件的使用</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;page-search&quot;&gt;</span><br><span class="line">    &lt;!-- 使用 form 表单 --&gt;</span><br><span class="line">    &lt;my-form v-bind=&quot;fromConfig&quot; v-model=&quot;formData&quot; /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot;&gt;</span><br><span class="line">import &#123; IForm, IFormItem &#125; from &quot;@/components/my-form&quot;;</span><br><span class="line">import &#123; defineComponent, ref, PropType &#125; from &quot;vue&quot;;</span><br><span class="line">export default defineComponent(&#123;</span><br><span class="line">  props: &#123;</span><br><span class="line">    fromConfig: &#123;</span><br><span class="line">      type: Object as PropType&lt;IForm&gt;,</span><br><span class="line">      required: true,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  emits: [&quot;handleReset&quot;, &quot;handleSearch&quot;],</span><br><span class="line">  setup(props, &#123; emit &#125;) &#123;</span><br><span class="line">    const items: IFormItem[] = props.fromConfig.formItems ?? [];</span><br><span class="line">    const pageSearchOrigin: any = &#123;&#125;;</span><br><span class="line">    // 将配置文件需要的字段取出生成存放结果的对象</span><br><span class="line">    for (const item of items) &#123;</span><br><span class="line">      (pageSearchOrigin as any)[item.field] = &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    const formData = ref(pageSearchOrigin);</span><br><span class="line">    return &#123;</span><br><span class="line">      formData,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h3><p>从上面代码可以看出来 <strong>Vue3</strong> 的 <strong>v-model</strong> 和 <strong>v-bind</strong> 指令非常好用都在 2 的基础上做了升级，也能看出来 <strong>Vue</strong> 通用组件的封装就是将可能会需要的表单项都写出来，然后根据配置文件的类型判断展示哪一项，这样做有一些优点和缺点</p>
+<ul>
+<li><p>优点：</p>
+<ul>
+<li><p>使用方便，使用时只需要传入一个配置文件和利用 <strong>v-model</strong> 获取结果即可</p>
+</li>
+<li><p>风格统一，这样整个项目中表单的组成方式一致，在修改时能减少很大的工作量</p>
+</li>
+</ul>
+</li>
+<li><p>缺点：</p>
+<ul>
+<li><p>使用有门槛，使用时需要对组件内部组成了解，才能写配置文件</p>
+</li>
+<li><p>增加表单项不方便，如果要增加表单项时必须去到组件内部</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="二、React-中封装组件"><a href="#二、React-中封装组件" class="headerlink" title="二、React 中封装组件"></a>二、React 中封装组件</h2><h3 id="1、封装组件-1"><a href="#1、封装组件-1" class="headerlink" title="1、封装组件"></a>1、封装组件</h3><figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">React</span>, &#123; memo, useEffect, useMemo &#125; <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="variable constant_">FC</span>, <span class="title class_">ReactNode</span> &#125; <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">Form</span>, <span class="title class_">FormInstance</span>, <span class="title class_">Row</span>, <span class="title class_">Col</span> &#125; <span class="keyword">from</span> <span class="string">&quot;antd&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">IFormOpt</span> &#125; <span class="keyword">from</span> <span class="string">&quot;./type&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="title class_">AuthCheck</span> <span class="keyword">from</span> <span class="string">&quot;../auth_check&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">IProps</span> &#123;</span><br><span class="line">  children?: <span class="title class_">ReactNode</span>;</span><br><span class="line">  form?: <span class="function">(<span class="params">formIns: FormInstance</span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">  <span class="attr">formOpt</span>: <span class="title class_">IFormOpt</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 表单项排列方式</span></span><br><span class="line"><span class="keyword">const</span> <span class="attr">colspanConfigs</span>: &#123;</span><br><span class="line">  [<span class="attr">key</span>: <span class="built_in">number</span>]: &#123; [<span class="attr">key</span>: <span class="built_in">string</span>]: <span class="built_in">number</span> &#125;;</span><br><span class="line">&#125; = &#123;</span><br><span class="line">  <span class="number">1</span>: &#123;</span><br><span class="line">    <span class="attr">xs</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">sm</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">md</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">lg</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">xl</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">xxl</span>: <span class="number">24</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">2</span>: &#123;</span><br><span class="line">    <span class="attr">xs</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">sm</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">md</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">lg</span>: <span class="number">12</span>,</span><br><span class="line">    <span class="attr">xl</span>: <span class="number">12</span>,</span><br><span class="line">    <span class="attr">xxl</span>: <span class="number">12</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">3</span>: &#123;</span><br><span class="line">    <span class="attr">xs</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">sm</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">md</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">lg</span>: <span class="number">8</span>,</span><br><span class="line">    <span class="attr">xl</span>: <span class="number">8</span>,</span><br><span class="line">    <span class="attr">xxl</span>: <span class="number">8</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">4</span>: &#123;</span><br><span class="line">    <span class="attr">xs</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">sm</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">md</span>: <span class="number">24</span>,</span><br><span class="line">    <span class="attr">lg</span>: <span class="number">8</span>,</span><br><span class="line">    <span class="attr">xl</span>: <span class="number">6</span>,</span><br><span class="line">    <span class="attr">xxl</span>: <span class="number">6</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">MyFrom</span>: <span class="variable constant_">FC</span>&lt;<span class="title class_">IProps</span>&gt; = <span class="function">(<span class="params">&#123; form, formOpt, children &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> [formIns] = <span class="title class_">Form</span>.<span class="title function_">useForm</span>();</span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (form) &#123;</span><br><span class="line">      <span class="title function_">form</span>(formIns);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [formIns]);</span><br><span class="line">  <span class="keyword">const</span> colspan = <span class="title function_">useMemo</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> key = formOpt.<span class="property">colspan</span> || <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> colspanConfigs[key];</span><br><span class="line">  &#125;, []);</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">Form</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">form</span>=<span class="string">&#123;formIns&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">initialValues</span>=<span class="string">&#123;formOpt.initialValues</span> || &#123;&#125;&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      <span class="attr">layout</span>=<span class="string">&#123;formOpt.layout&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">      &#123;<span class="attr">...formOpt.itemLayout</span>&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">    &gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">Row</span> <span class="attr">gutter</span>=<span class="string">&#123;20&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        &#123;formOpt.items.map((item) =&gt; &#123;</span></span><br><span class="line"><span class="language-xml">          const colOpt = item.width ? &#123; flex: item.width &#125; : colspan;</span></span><br><span class="line"><span class="language-xml">          return (</span></span><br><span class="line"><span class="language-xml">            <span class="tag">&lt;<span class="name">AuthCheck</span> <span class="attr">permission</span>=<span class="string">&#123;item.permission&#125;</span> <span class="attr">key</span>=<span class="string">&#123;item.name</span> || <span class="attr">item.id</span>&#125;&gt;</span></span></span><br><span class="line"><span class="language-xml">              <span class="tag">&lt;<span class="name">Col</span> &#123;<span class="attr">...colOpt</span>&#125;&gt;</span></span></span><br><span class="line"><span class="language-xml">                <span class="tag">&lt;<span class="name">Form.Item</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">                  <span class="attr">name</span>=<span class="string">&#123;item.name&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">                  <span class="attr">label</span>=<span class="string">&#123;item.label&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">                  <span class="attr">rules</span>=<span class="string">&#123;item.rules</span> || []&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">                &gt;</span></span></span><br><span class="line"><span class="language-xml">                  &#123;item.element&#125;</span></span><br><span class="line"><span class="language-xml">                <span class="tag">&lt;/<span class="name">Form.Item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">              <span class="tag">&lt;/<span class="name">Col</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">            <span class="tag">&lt;/<span class="name">AuthCheck</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          );</span></span><br><span class="line"><span class="language-xml">        &#125;)&#125;</span></span><br><span class="line"><span class="language-xml">        &#123;children &amp;&amp; <span class="tag">&lt;<span class="name">Col</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">Col</span>&gt;</span>&#125;</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">Row</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">Form</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title function_">memo</span>(<span class="title class_">MyFrom</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、配置文件-1"><a href="#2、配置文件-1" class="headerlink" title="2、配置文件"></a>2、配置文件</h3><figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">Input</span>, <span class="title class_">Radio</span> &#125; <span class="keyword">from</span> <span class="string">&quot;antd&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> <span class="title class_">IFormItem</span> &#123;</span><br><span class="line">  <span class="attr">label</span>: <span class="built_in">string</span>;</span><br><span class="line">  name?: <span class="built_in">string</span>;</span><br><span class="line">  id?: <span class="built_in">string</span>;</span><br><span class="line">  rules?: <span class="title class_">FormRule</span>[];</span><br><span class="line">  width?: <span class="built_in">string</span> | <span class="built_in">number</span>;</span><br><span class="line">  <span class="attr">element</span>: <span class="title class_">ReactNode</span>;</span><br><span class="line">  permission?: <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> <span class="title class_">IFormOpt</span>&lt;T = <span class="built_in">any</span>&gt; &#123;</span><br><span class="line">  itemLayout?: &#123;</span><br><span class="line">    labelCol?: <span class="built_in">object</span>;</span><br><span class="line">    wrapperCol?: <span class="built_in">object</span>;</span><br><span class="line">  &#125;;</span><br><span class="line">  layout?: <span class="string">&quot;horizontal&quot;</span> | <span class="string">&quot;vertical&quot;</span> | <span class="string">&quot;inline&quot;</span>;</span><br><span class="line">  <span class="attr">items</span>: <span class="title class_">IFormItem</span>[];</span><br><span class="line">  colspan?: <span class="number">1</span> | <span class="number">2</span> | <span class="number">3</span> | <span class="number">4</span>;</span><br><span class="line">  initialValues?: T;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="attr">addStaffFormOpt</span>: <span class="title class_">IFormOpt</span> = &#123;</span><br><span class="line">  <span class="attr">itemLayout</span>: &#123;</span><br><span class="line">    <span class="attr">labelCol</span>: &#123; <span class="attr">span</span>: <span class="number">4</span> &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">initialValues</span>: &#123; <span class="attr">sex</span>: <span class="number">0</span> &#125;,</span><br><span class="line">  <span class="attr">items</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">label</span>: <span class="string">&quot;员工姓名&quot;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;name&quot;</span>,</span><br><span class="line">      <span class="attr">rules</span>: [&#123; <span class="attr">required</span>: <span class="literal">true</span>, <span class="attr">message</span>: <span class="string">&quot;员工姓名不能为空&quot;</span> &#125;],</span><br><span class="line">      <span class="attr">element</span>: <span class="language-xml"><span class="tag">&lt;<span class="name">Input</span> <span class="attr">placeholder</span>=<span class="string">&quot;请输入员工姓名&quot;</span> /&gt;</span></span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">label</span>: <span class="string">&quot;员工性别&quot;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;sex&quot;</span>,</span><br><span class="line">      <span class="attr">rules</span>: [&#123; <span class="attr">required</span>: <span class="literal">true</span>, <span class="attr">message</span>: <span class="string">&quot;员工性别不能为空&quot;</span> &#125;],</span><br><span class="line">      <span class="attr">element</span>: (</span><br><span class="line">        <span class="language-xml"><span class="tag">&lt;<span class="name">Radio.Group</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">Radio</span> <span class="attr">value</span>=<span class="string">&#123;0&#125;</span>&gt;</span>男<span class="tag">&lt;/<span class="name">Radio</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">Radio</span> <span class="attr">value</span>=<span class="string">&#123;1&#125;</span>&gt;</span>女<span class="tag">&lt;/<span class="name">Radio</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;/<span class="name">Radio.Group</span>&gt;</span></span></span><br><span class="line">      ),</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">label</span>: <span class="string">&quot;账号密码&quot;</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;password&quot;</span>,</span><br><span class="line">      <span class="attr">rules</span>: [&#123; <span class="attr">required</span>: <span class="literal">true</span>, <span class="attr">message</span>: <span class="string">&quot;账号密码不能为空&quot;</span> &#125;],</span><br><span class="line">      <span class="attr">element</span>: <span class="language-xml"><span class="tag">&lt;<span class="name">Input.Password</span> <span class="attr">placeholder</span>=<span class="string">&quot;请输入账号密码&quot;</span> /&gt;</span></span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// useFormOpt hook的代码，能够手动修改配置项，模仿useState风格</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123; useState &#125; <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">IFormItem</span>, <span class="title class_">IFormOpt</span> &#125; <span class="keyword">from</span> <span class="string">&quot;@/components/my_form/type&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">MyObject</span> &#125; <span class="keyword">from</span> <span class="string">&quot;@/react-app-env&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">SetFormOpt</span> = <span class="function">(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="comment">// 新的表单配置，可以是新的值或者回调函数</span></span></span></span><br><span class="line"><span class="params"><span class="function">  newOpt: Partial&lt;IFormOpt&gt; | ((items: IFormOpt) =&gt; IFormOpt),</span></span></span><br><span class="line"><span class="params"><span class="function">  <span class="comment">// 允许传入一些表单项的字段来做剔除它们，这常用于表单配置仅表单项删减时</span></span></span></span><br><span class="line"><span class="params"><span class="function">  excludes?: <span class="built_in">string</span>[]</span></span></span><br><span class="line"><span class="params"><span class="function"></span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> <span class="title class_">UseFormOptReturn</span> = [<span class="attr">formOpt</span>: <span class="title class_">IFormOpt</span>, <span class="attr">setFormOpt</span>: <span class="title class_">SetFormOpt</span>];</span><br><span class="line"><span class="comment">// 排除一些不需要的form表单配置项</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">excludeFormOptItem</span>(<span class="params">items: IFormItem[], exclude: <span class="built_in">string</span>[] = []</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="attr">result</span>: <span class="title class_">IFormItem</span>[] = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> items) &#123;</span><br><span class="line">    <span class="keyword">const</span> id = item.<span class="property">name</span> || item.<span class="property">id</span>;</span><br><span class="line">    <span class="keyword">if</span> (!exclude.<span class="title function_">includes</span>(id!)) &#123;</span><br><span class="line">      result.<span class="title function_">push</span>(item);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">useFormOpt</span>(<span class="params">formOpt: IFormOpt</span>): <span class="title class_">UseFormOptReturn</span> &#123;</span><br><span class="line">  <span class="comment">// 这样能够实现在配置修改时能通知子组件也改变</span></span><br><span class="line">  <span class="keyword">const</span> [opt, setOpt] = useState&lt;<span class="title class_">IFormOpt</span>&gt;(formOpt);</span><br><span class="line">  <span class="comment">// 修改表单配置，可只修改部分</span></span><br><span class="line">  <span class="keyword">const</span> <span class="attr">setFormOpt</span>: <span class="title class_">SetFormOpt</span> = <span class="function">(<span class="params">newOpt, excludes</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="attr">formOpt</span>: <span class="built_in">any</span> = &#123;&#125;;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> newOpt === <span class="string">&quot;function&quot;</span>) &#123;</span><br><span class="line">      formOpt = <span class="title function_">newOpt</span>(opt);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      formOpt = newOpt <span class="keyword">as</span> <span class="title class_">IFormOpt</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title class_">Array</span>.<span class="title function_">isArray</span>(excludes)) &#123;</span><br><span class="line">      formOpt.<span class="property">items</span> = <span class="title function_">excludeFormOptItem</span>(opt.<span class="property">items</span>, excludes);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title function_">setOpt</span>(<span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, opt, formOpt));</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">return</span> [opt, setFormOpt];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、组件的使用-1"><a href="#3、组件的使用-1" class="headerlink" title="3、组件的使用"></a>3、组件的使用</h3><figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">Modal</span> &#125; <span class="keyword">from</span> <span class="string">&quot;antd&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="title class_">React</span>, &#123; memo, useEffect &#125; <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="variable constant_">FC</span>, <span class="title class_">ReactNode</span> &#125; <span class="keyword">from</span> <span class="string">&quot;react&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="title class_">MyForm</span> <span class="keyword">from</span> <span class="string">&quot;../my_form&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">IFormOpt</span> &#125; <span class="keyword">from</span> <span class="string">&quot;../my_form/type&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">FormInstance</span> &#125; <span class="keyword">from</span> <span class="string">&quot;antd&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> <span class="title class_">IMyModal</span> &#123;</span><br><span class="line">  <span class="attr">show</span>: <span class="function">() =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">IProps</span> &#123;</span><br><span class="line">  children?: <span class="title class_">ReactNode</span>;</span><br><span class="line">  <span class="attr">title</span>: <span class="built_in">string</span>;</span><br><span class="line">  instance?: <span class="function">(<span class="params">ins: IMyModal</span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">  formOpt?: <span class="title class_">IFormOpt</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">MyModal</span>: <span class="variable constant_">FC</span>&lt;<span class="title class_">IProps</span>&gt; = <span class="function">(<span class="params">&#123; title, children, instance, formOpt &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> [formIns, setFormIns] = <span class="title class_">React</span>.<span class="property">useState</span>&lt;<span class="title class_">FormInstance</span>&gt;();</span><br><span class="line">  <span class="comment">// 因为antd的form组件在设置默认值时，只在初始化时有效，所以我们需要手动设置</span></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    formIns?.<span class="title function_">setFieldsValue</span>(formOpt?.<span class="property">initialValues</span>);</span><br><span class="line">  &#125;, [formOpt?.<span class="property">initialValues</span>]);</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;form-wrapp&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        &#123;/* 获取实例和传入配置 */&#125;</span></span><br><span class="line"><span class="language-xml">        &#123;formOpt ? <span class="tag">&lt;<span class="name">MyForm</span> <span class="attr">form</span>=<span class="string">&#123;setFormIns&#125;</span> <span class="attr">formOpt</span>=<span class="string">&#123;formOpt&#125;</span> /&gt;</span> : children&#125;</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title function_">memo</span>(<span class="title class_">MyModal</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、总结-1"><a href="#4、总结-1" class="headerlink" title="4、总结"></a>4、总结</h3><p>从上面代码可以看出来，<strong>React</strong> 封装组件时组件内部结构就比较简单了，因为 <strong>jsx</strong>&#x2F;<strong>tsx</strong> 的独特优势，<strong>React</strong> 能够完全利用函数式编程的思想，随处编写组件使用组件，同样是使用配置文件，但是又有明显的区别</p>
+<ul>
+<li>优点：<ul>
+<li>表单项的输入组件也能包含在配置文件中，并且 <strong>antd</strong> 的 <strong>Form.Item</strong> 组件会自动将输入组件变为受控组件</li>
+<li>使用简单，使用时配合 <strong>TS</strong> 的类型提示，能十分轻松的完成表单配置</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>数据并非响应式，使用时要手动获取</li>
+<li>每次编写配置文件时都需要额外的引入需要的组件，虽然也可以封装为一个组件然后传入配置更改，但是这样就失去了函数式编程的灵活性，各有利弊吧</li>
+</ul>
+</li>
+</ul>
+<h2 id="三、一些总结"><a href="#三、一些总结" class="headerlink" title="三、一些总结"></a>三、一些总结</h2><p>说起来也好笑， <strong>Vue</strong> 的规则有点多，模版语法、内置指令、插件编写、公共属性编写的方法，其中很多写法都是固定的，刚开始学习时要记忆，便有些吃力，不过学会后使用时就非常轻松。</p>
+<p>而 <strong>React</strong> 则全然不同，虽然同样有些规则，但是这些规则和 <strong>JS</strong> 原生规则类似，例如 <strong>useEffect</strong> 中的回调函数不能是异步函数，<strong>useRef</strong> 生成的是一个对象且对象中有个 <strong>current</strong> 属性等，这些都好理解也便于记忆，但是在使用过程中要格外注意的就很多了，数据没有做劫持，那么要手动调用改变数据的函数，还有函数式组件每一次数据更新时函数都会重新执行，那些逻辑复杂耗时的操作也会立即重新执行一遍，这意味着在编写组件时要注意缓存，缓存时又要注意作用域的问题，反正使用起来要注意一堆问题。</p>
+<p>不过，虽然 <strong>React</strong> 使用时要注意很多问题，但是只要掌握了这些之后便会习惯并且爱上，因为自由是无价的。</p>
+
+</article>
+    
+    
+
+</div>
+<div class="trm-post-next-prev row">
+    <div class="col-lg-12">
+        <!-- title -->
+        <h5 class="trm-title-with-divider">
+            其他文章
+            <span data-number="02"></span>
+        </h5>
+    </div>
+    
+        <div class="col-lg-6">
+    <div class="trm-blog-card trm-scroll-animation">
+        <a href="/2024/01/01/%E7%AC%94%E8%AE%B0/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%BD%91%E9%A1%B5%E5%85%83%E7%B4%A0%E6%8B%96%E6%8B%BD%E6%8E%92%E5%BA%8F/" class="trm-cover-frame trm-anima-link">
+            
+            
+                <img alt="cover" class="no-fancybox" src="/img/bg6.png">
+            
+        </a>
+        
+        <div class="trm-card-descr">
+            <div class="trm-label trm-category trm-mb-20">
+                <a href=" /categories/vue/">
+                    vue
+                </a>
+            </div>
+            <h5>
+                <a href="/2024/01/01/%E7%AC%94%E8%AE%B0/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%BD%91%E9%A1%B5%E5%85%83%E7%B4%A0%E6%8B%96%E6%8B%BD%E6%8E%92%E5%BA%8F/" class="trm-anima-link">
+                    移动端网页元素拖拽排序
+                </a>
+            </h5>
+            <div class="trm-divider trm-mb-20 trm-mt-20"></div>
+            <ul class="trm-card-data trm-label">
+                <li>24/01/01</li>
+                <li>17:53</li>
+                
+                
+            </ul>
+        </div>
+    </div>
+</div>
+    
+    
+        <div class="col-lg-6">
+    <div class="trm-blog-card trm-scroll-animation">
+        <a href="/2023/12/05/%E7%AC%94%E8%AE%B0/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%89%8D%E7%AB%AF%E7%9A%84%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2/" class="trm-cover-frame trm-anima-link">
+            
+            
+                <img alt="cover" class="no-fancybox" src="/img/bg3.jpg">
+            
+        </a>
+        
+        <div class="trm-card-descr">
+            <div class="trm-label trm-category trm-mb-20">
+                <a href=" /categories/%E7%AC%94%E8%AE%B0/">
+                    笔记
+                </a>
+            </div>
+            <h5>
+                <a href="/2023/12/05/%E7%AC%94%E8%AE%B0/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%89%8D%E7%AB%AF%E7%9A%84%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2/" class="trm-anima-link">
+                    记一次前端的条件查询
+                </a>
+            </h5>
+            <div class="trm-divider trm-mb-20 trm-mt-20"></div>
+            <ul class="trm-card-data trm-label">
+                <li>23/12/05</li>
+                <li>11:07</li>
+                
+                
+            </ul>
+        </div>
+    </div>
+</div>
+    
+</div>
+
+    
+
+
+
+                    <div class="trm-divider footer-divider"></div>
+
+                    <!-- footer -->
+                    <footer class="trm-scroll-animation">
+
+    
+
+    
+
+    
+        <div class="trm-footer-item">
+            <span>
+                由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v6.3.0
+            </span>
+            <span class="footer-separator" data-separator=" | "></span>
+            <span> 
+                主题 - 
+                <a rel="noopener" href='https://github.com/MaLuns/hexo-theme-async' target='_blank'>Async</a>
+                v2.1.2
+            </span>
+        </div>
+      
+
+     
+
+     
+</footer>
+ 
+                    <!-- footer end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- body end -->
+
+            
+
+    <div id="post-toc" class="trm-post-toc">
+      <div class="trm-post-toc-header">
+        目录导航
+      </div>
+      <div class="trm-post-toc-content">
+        <ol class="trm-toc"><li class="trm-toc-item trm-toc-level-1"><a rel="nofollow" class="trm-toc-link" href="#关于-React-和-Vue3-中封装通用组件的一些想法"><span class="trm-toc-number">1.</span> <span class="trm-toc-text">关于 React 和 Vue3 中封装通用组件的一些想法</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#一、VUE-中封装组件"><span class="trm-toc-number">1.1.</span> <span class="trm-toc-text">一、VUE 中封装组件</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#1、封装组件"><span class="trm-toc-number">1.1.1.</span> <span class="trm-toc-text">1、封装组件</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#2、配置文件"><span class="trm-toc-number">1.1.2.</span> <span class="trm-toc-text">2、配置文件</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#3、组件的使用"><span class="trm-toc-number">1.1.3.</span> <span class="trm-toc-text">3、组件的使用</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#4、总结"><span class="trm-toc-number">1.1.4.</span> <span class="trm-toc-text">4、总结</span></a></li></ol></li><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#二、React-中封装组件"><span class="trm-toc-number">1.2.</span> <span class="trm-toc-text">二、React 中封装组件</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#1、封装组件-1"><span class="trm-toc-number">1.2.1.</span> <span class="trm-toc-text">1、封装组件</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#2、配置文件-1"><span class="trm-toc-number">1.2.2.</span> <span class="trm-toc-text">2、配置文件</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#3、组件的使用-1"><span class="trm-toc-number">1.2.3.</span> <span class="trm-toc-text">3、组件的使用</span></a></li><li class="trm-toc-item trm-toc-level-3"><a rel="nofollow" class="trm-toc-link" href="#4、总结-1"><span class="trm-toc-number">1.2.4.</span> <span class="trm-toc-text">4、总结</span></a></li></ol></li><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#三、一些总结"><span class="trm-toc-number">1.3.</span> <span class="trm-toc-text">三、一些总结</span></a></li></ol></li></ol>
+      </div>
+    </div>
+
+            
+<div class="trm-fixed-container">
+    
+        <div class="trm-fixed-btn post-toc-btn" data-title="目录">
+            <i class="iconfont fas fa-th-list"></i>
+        </div>
+    
+    
+        <div class="trm-fixed-btn" data-title="阅读模式" onclick="asyncFun.switchReadMode()">
+            <i class="iconfont fas fa-book-reader"></i>
+        </div>
+    
+    
+    <div id="trm-back-top" class="trm-fixed-btn" data-title="回到顶部">
+        <i class="iconfont fas fa-arrow-up"></i>
+    </div>
+</div>
+        </div>
+      </div>
+      <!-- scroll container end -->
+  </div>
+  <!-- app wrapper end -->
+
+  
+    <div class="trm-search-popup">
+        <div class="trm-search-wrapper">
+            <div class="form trm-search-form">
+                <div class="trm-search-input-icon">
+                    <i class="iconfont fas fa-search"></i>
+                </div>
+                <input class="trm-search-input" type="text" placeholder="搜索文章...">
+                <div class="trm-search-btn-close">
+                    <i class="iconfont fas fa-times"></i>
+                </div>
+            </div>
+            <div class="trm-search-result-container">
+                <div class="trm-search-empty">
+                    请输入关键词进行搜索
+                </div>
+            </div>
+            <div class="trm-search-footer">
+                <div class="trm-search-stats"></div>
+                <ul class="trm-search-commands">
+                    <li>
+                        <kbd class="command-palette-commands-key">
+                            <svg width="15" height="15" aria-label="Escape key" role="img">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.2">
+                                    <path
+                                        d="M13.6167 8.936c-.1065.3583-.6883.962-1.4875.962-.7993 0-1.653-.9165-1.653-2.1258v-.5678c0-1.2548.7896-2.1016 1.653-2.1016.8634 0 1.3601.4778 1.4875 1.0724M9 6c-.1352-.4735-.7506-.9219-1.46-.8972-.7092.0246-1.344.57-1.344 1.2166s.4198.8812 1.3445.9805C8.465 7.3992 8.968 7.9337 9 8.5c.032.5663-.454 1.398-1.4595 1.398C6.6593 9.898 6 9 5.963 8.4851m-1.4748.5368c-.2635.5941-.8099.876-1.5443.876s-1.7073-.6248-1.7073-2.204v-.4603c0-1.0416.721-2.131 1.7073-2.131.9864 0 1.6425 1.031 1.5443 2.2492h-2.956">
+                                    </path>
+                                </g>
+                            </svg>
+                        </kbd>
+                        <span class="command-palette-Label">to close</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+  <!-- Plugin -->
+
+
+
+
+    
+    
+<script src="https://unpkg.com/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+
+    
+
+    
+        <script src="/js/plugins/typing.js?v=2.1.2"></script>
+    
+
+    
+        
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js"></script>
+
+        <script src="/js/plugins/local_search.js?v=2.1.2"></script>
+    
+
+    <!-- 数学公式 -->
+    
+
+    <!-- 评论插件 -->
+    
+        
+
+        
+    
+
+
+
+<!-- CDN -->
+
+
+    
+
+    
+
+    
+
+
+
+
+    <!-- Service Worker -->
+    
+    <!-- baidu push -->
+    
+
+
+<script id="async-script" src="/js/main.js?v=2.1.2"></script>
+
+</body>
+
+</html>

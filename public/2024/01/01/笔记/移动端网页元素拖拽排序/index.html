@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="x5-fullscreen" content="true">
+<meta name="full-screen" content="yes">
+<meta name="theme-color" content="#317EFB" />
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=0" name="viewport">
+<meta name="description" content="移动端网页元素拖拽排序最近在用 vue3 写一个移动端网页的 demo 时涉及到了一个拖拽排序的功能，因为是学习阶段所以没有选择使用第三方库，想自己实现一下。在实现过程中才发现 PC 端的 drag 相关事件在移动端是无效的，要想实现的话就得使用 touch 相关事件。 本文的实现方式直接操作了 dom 元素，所以整体实现方式较简单。  让元素移动拖拽排序的第一步肯定是让元素能跟随鼠标&amp;#x2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="移动端网页元素拖拽排序">
+<meta property="og:url" content="http://example.com/2024/01/01/%E7%AC%94%E8%AE%B0/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%BD%91%E9%A1%B5%E5%85%83%E7%B4%A0%E6%8B%96%E6%8B%BD%E6%8E%92%E5%BA%8F/index.html">
+<meta property="og:site_name" content="王有为的小站">
+<meta property="og:description" content="移动端网页元素拖拽排序最近在用 vue3 写一个移动端网页的 demo 时涉及到了一个拖拽排序的功能，因为是学习阶段所以没有选择使用第三方库，想自己实现一下。在实现过程中才发现 PC 端的 drag 相关事件在移动端是无效的，要想实现的话就得使用 touch 相关事件。 本文的实现方式直接操作了 dom 元素，所以整体实现方式较简单。  让元素移动拖拽排序的第一步肯定是让元素能跟随鼠标&amp;#x2">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/img/404.jpg">
+<meta property="og:image" content="http://example.com/img/404.jpg">
+<meta property="article:published_time" content="2024-01-01T09:53:20.000Z">
+<meta property="article:modified_time" content="2024-01-01T11:08:12.185Z">
+<meta property="article:author" content="王有为">
+<meta property="article:tag" content="王有为的小站,王有为,前端,我的生活,技术博客">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/404.jpg">
+
+    <meta name="keywords" content="王有为的小站,王有为,前端,我的生活,技术博客">
+
+
+<title >移动端网页元素拖拽排序</title>
+
+<!-- Favicon -->
+
+    <link href='/img/favicon-16x16.png?v=2.1.2' rel='icon' type='image/png' sizes='16x16' ></link>
+
+
+    <link href='/img/favicon-32x32.png?v=2.1.2' rel='icon' type='image/png' sizes='32x32' ></link>
+
+
+    <link href='/apple-touch-icon.png?v=2.1.2' rel='apple-touch-icon' sizes='180x180' ></link>
+
+
+    <link href='/site.webmanifest' rel='manifest' ></link>
+
+
+<!-- Plugin -->
+
+
+
+
+    
+<link rel="stylesheet" href="/css/plugins/bootstrap.row.css">
+
+    
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@4.0/dist/fancybox.css">
+
+    
+    
+
+
+
+
+<!-- Icon -->
+
+    
+<link rel="stylesheet" href="/css/plugins/font-awesome.min.css">
+
+
+
+
+<!-- Variable -->
+<script>window.ASYNC_CONFIG = {"hostname":"example.com","author":"王有为","root":"/","typed_text":["相信美好的事情即将发生","对世界报之以歌"],"theme_version":"2.1.2","theme":{"switch":true,"default":"style-light"},"favicon":{"logo":"/img/favicon-32x32.png","icon16":"/img/favicon-16x16.png","icon32":"/img/favicon-32x32.png","appleTouchIcon":"apple-touch-icon.png","webmanifest":"/site.webmanifest","visibilitychange":true,"hidden":"/failure.ico","showText":"(/≧▽≦/)咦！又好了！","hideText":"(●—●)喔哟，崩溃啦！"},"i18n":{"placeholder":"搜索文章...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）","author":"本文作者：","copyright_link":"本文链接：","copyright_license_title":"版权声明：","copyright_license_content":"本博客所有文章除特别声明外，均默认采用 undefined 许可协议。","copy_success":"复制成功","copy_failure":"复制失败","open_read_mode":"进入阅读模式","exit_read_mode":"退出阅读模式","notice_outdate_message":"距离上次更新已经 undefined 天了, 文章内容可能已经过时。","just":"刚刚","min":"分钟前","hour":"小时前","day":"天前","month":"个月前"},"swup":false,"plugin":{"flickr_justified_gallery":"https://unpkg.com/flickr-justified-gallery@latest/dist/fjGallery.min.js"},"icons":{"sun":"far fa-sun","moon":"far fa-moon","play":"fas fa-play","email":"far fa-envelope","next":"fas fa-arrow-right","calendar":"far fa-calendar-alt","clock":"far fa-clock","user":"far fa-user","back_top":"fas fa-arrow-up","close":"fas fa-times","search":"fas fa-search","reward":"fas fa-hand-holding-usd","user_tag":"fas fa-user-alt","toc_tag":"fas fa-th-list","read":"fas fa-book-reader","arrows":"fas fa-arrows-alt-h","double_arrows":"fas fa-angle-double-down","copy":"fas fa-copy"},"icontype":"font","highlight":{"plugin":"highlighjs","theme":true,"copy":true,"lang":true,"title":"mac","height_limit":200},"toc":{"post_title":false},"search":{"enable":true,"type":"local","href":"https://www.google.com/search?q=site:","domain":null,"preload":true,"trigger":"auto","path":"search.xml"}};</script>
+<script id="async-page-config">window.PAGE_CONFIG = {"isPost":true,"isHome":false,"postUpdate":"2024-01-01 19:08:12"};</script>
+
+<!-- Theme mode css -->
+<link data-swup-theme rel="stylesheet" href="/css/index.css?v=2.1.2" id="trm-switch-style">
+<script>
+    let defaultMode = ASYNC_CONFIG.theme.default !=='auto' ?  ASYNC_CONFIG.theme.default : (window.matchMedia("(prefers-color-scheme: light)").matches ? 'style-light' : 'style-dark')
+    let catchMode = localStorage.getItem('theme-mode') || defaultMode;
+    let type = catchMode === 'style-dark' ? 'add' : 'remove';
+    document.documentElement.classList[type]('dark')
+</script>
+
+<!-- CDN -->
+
+
+    
+    
+
+
+
+<!-- Site Analytics -->
+ 
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+
+  <!-- app wrapper -->
+  <div class="trm-app-frame">
+
+    <!-- page preloader -->
+    <div class="trm-preloader">
+    <div class="trm-holder">
+        <div class="preloader">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+</div>
+    <!-- page preloader end -->
+
+    <!-- change mode preloader -->
+    <div class="trm-mode-swich-animation-frame">
+    <div class="trm-mode-swich-animation">
+        <i class="i-sun"><i class="iconfont far fa-sun"></i></i>
+        <div class="trm-horizon"></div>
+        <i class="i-moon"><i class="iconfont far fa-moon"></i></i>
+    </div>
+</div>
+    <!-- change mode preloader end -->
+
+      <!-- scroll container -->
+      <div id="trm-dynamic-content" class="trm-swup-animation">
+        <div id="trm-scroll-container" class="trm-scroll-container" style="opacity: 0">
+            <!-- top bar -->
+            <header class="trm-top-bar">
+	<div class="container">
+		<div class="trm-left-side">
+			<!-- logo -->
+<a href="/" class="trm-logo-frame trm-anima-link">
+    
+        <img alt="logo" src="/img/favicon-32x32.png">
+    
+    
+        <div class="trm-logo-text">
+            Youwei<span>Wang</span>
+        </div>
+    
+</a>
+<!-- logo end -->
+		</div>
+		<div class="trm-right-side">
+			<!-- menu -->
+<div class="trm-menu">
+    <nav>
+        <ul>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/" target="">
+                    首页
+                </a>
+                
+            </li>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/archives/" target="">
+                    档案
+                </a>
+                
+            </li>
+            
+            <li class="menu-item-has-children ">
+                <a  href="/about/" target="">
+                    关于
+                </a>
+                
+            </li>
+            
+        </ul>
+    </nav>
+</div>
+<!-- menu end -->
+			
+    <!-- mode switcher place -->
+    <div class="trm-mode-switcher-place">
+        <div class="trm-mode-switcher">
+            <i class="iconfont far fa-sun"></i>
+            <input class="tgl tgl-light" id="trm-swich" type="checkbox">
+            <label class="trm-swich" for="trm-swich"></label>
+            <i class="iconfont far fa-moon"></i>
+        </div>
+    </div>
+    <!-- mode switcher place end -->
+
+			
+    
+    <div id="trm-search-btn" class="trm-search-btn">
+        <i class="iconfont fas fa-search"></i>
+    </div>
+     
+
+		</div>
+		<div class="trm-menu-btn">
+			<span></span>
+		</div>
+	</div>
+</header>
+            <!-- top bar end -->
+
+            <!-- body -->
+            
+<div class="trm-content-start">
+    <!-- banner -->
+    <div class="trm-banner">
+    
+    <!-- banner cover -->
+    <img style="object-position:top;object-fit:cover;" alt="banner" class="trm-banner-cover" src="/img/bg6.png">
+    <!-- banner cover end -->
+    
+
+    <!-- banner content -->
+    <div class="trm-banner-content trm-overlay">
+        <div class="container">
+            <div class="row">
+                
+                <div class="col-lg-4"></div>
+                
+                <div class="col-lg-8">
+
+                    <!-- banner title -->
+                    <div class="trm-banner-text ">
+                        <div class="trm-label trm-mb-20">
+                            Hi my new friend!
+                        </div>
+                        <h1 class="trm-mb-30 trm-hsmb-font">
+                            移动端网页元素拖拽排序
+                        </h1>
+
+                        
+                            <ul class="trm-breadcrumbs trm-label">
+                                <li>
+                                    <a href="/" class="trm-anima-link">Home</a>
+                                </li>
+                                <li>
+                                    <span>
+                                        2024
+                                    </span>
+                                </li>
+                            </ul>
+                        
+                    </div>
+                    <!-- banner title end -->
+
+                    <!-- scroll hint -->
+                    <span id="scroll-triger" class="trm-scroll-hint-frame">
+                        <div class="trm-scroll-hint"></div>
+                        <span class="trm-label">Scroll down</span>
+                    </span>
+                    <!-- scroll hint end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- banner content end -->
+</div>
+    <!-- banner end -->
+    <div class="container">
+        <div class="row">
+            
+                <div class="trm-page-sidebar col-lg-4 hidden-sm">
+                    <!-- main card -->
+                    <div class="trm-main-card-frame trm-sidebar">
+    <div class="trm-main-card"> 
+        <!-- card header -->
+<div class="trm-mc-header">
+    <div class="trm-avatar-frame trm-mb-20">
+        <img alt="Avatar" class="trm-avatar" src="https://img2.baidu.com/it/u=1010239227,3765400123&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500">
+    </div>
+    <h5 class="trm-name trm-mb-15">
+        王有为
+    </h5>
+    
+        <div class="trm-label">
+            
+            <span class="trm-typed-text">
+                <!-- Words for theme.user.typedText -->
+            </span>
+        </div>
+    
+</div>
+<!-- card header end -->
+        <!-- sidebar social -->
+
+<div class="trm-divider trm-mb-40 trm-mt-40"></div>
+<div class="trm-social">
+    
+        <a href="https://github.com/2990275358" title="github" rel="nofollow" target="_blank">
+            <i class="iconfont fab fa-github"></i>
+        </a>
+    
+</div>
+
+<!-- sidebar social end -->
+        <!-- info -->
+<div class="trm-divider trm-mb-40 trm-mt-40"></div>
+<ul class="trm-table trm-mb-20">
+    
+        <li>
+            <div class="trm-label">
+                地址:
+            </div>
+            <div class="trm-label trm-label-light">
+                湖北荆州
+            </div>
+        </li>
+    
+        <li>
+            <div class="trm-label">
+                年龄:
+            </div>
+            <div class="trm-label trm-label-light">
+                18
+            </div>
+        </li>
+    
+</ul>
+<!-- info end -->
+
+        
+    <div class="trm-divider trm-mb-40 trm-mt-40"></div>
+    <!-- action button -->
+    <div class="text-center">
+        <a href="mailto:2990275358@qq.com" class="trm-btn">
+            联系我
+            <i class="iconfont far fa-envelope"></i>
+        </a>
+    </div>
+    <!-- action button end -->
+
+    </div>
+</div>
+                    <!-- main card end -->
+                </div>
+            
+            <div class="trm-page-content col-lg-8">
+                <div id="trm-content" class="trm-content">
+                    <div class="trm-post-info row hidden-sm">
+    <div class="col-sm-4">
+        <div class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-calendar-alt trm-icon"></i><br>
+            01/01
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-clock trm-icon"></i><br>
+            17:53
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div id="post-author" class="trm-card trm-label trm-label-light text-center">
+            <i class="iconfont far fa-user trm-icon"></i><br>
+            王有为
+        </div>
+    </div>
+</div>
+<div class="trm-card ">
+    <article id="article-container" class="trm-publication">
+    <meta name="referrer" content="no-referrer" />
+
+<h1 id="移动端网页元素拖拽排序"><a href="#移动端网页元素拖拽排序" class="headerlink" title="移动端网页元素拖拽排序"></a>移动端网页元素拖拽排序</h1><p>最近在用 <strong>vue3</strong> 写一个移动端网页的 <strong>demo</strong> 时涉及到了一个拖拽排序的功能，因为是学习阶段所以没有选择使用第三方库，想自己实现一下。在实现过程中才发现 <strong>PC</strong> 端的 <strong>drag</strong> 相关事件在移动端是无效的，要想实现的话就得使用 <strong>touch</strong> 相关事件。</p>
+<p>本文的实现方式直接操作了 <strong>dom</strong> 元素，所以整体实现方式较简单。</p>
+<p><img src="https://gitee.com/jiumuri/images/raw/master/PicGo-updata-img/202401011721843.png" alt="image-20240101172117625" loading="lazy" onerror='this.onerror=null;this.src="/img/404.jpg"'></p>
+<h2 id="让元素移动"><a href="#让元素移动" class="headerlink" title="让元素移动"></a>让元素移动</h2><p>拖拽排序的第一步肯定是让元素能跟随鼠标&#x2F;手指移动而移动了，常用的做法就是 <strong>touchStart</strong> 事件触发时记录一次 <strong>xy</strong> 的位置，在 <strong>touchMove</strong> 事件触发时减去开始的位置来设置元素的位置 。</p>
+<p>我的页面设计是按住右边的 <strong>icon</strong> 来拖动整个 <strong>item</strong>，所以拖动事件是绑定到 <strong>icon</strong> 上的，在取目标元素时需要特别注意当前元素。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">&lt;script lang=&quot;ts&quot; setup&gt;</span><br><span class="line">import &#123; ref, onMounted &#125; from &quot;vue&quot;;</span><br><span class="line"></span><br><span class="line">const props = defineProps&lt;&#123;</span><br><span class="line">  data: &#123; ranking: number; name: string; id: number &#125;;</span><br><span class="line">&#125;&gt;();</span><br><span class="line">const divEl = ref&lt;HTMLDivElement&gt;();</span><br><span class="line">const emit = defineEmits&lt;&#123;</span><br><span class="line">  change: [data: any[]];</span><br><span class="line">&#125;&gt;();</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;item s-flex&quot; ref=&quot;divEl&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;icon-box&quot;&gt;</span><br><span class="line">      &lt;van-icon name=&quot;clear&quot; color=&quot;#ff0202&quot; size=&quot;24px&quot; /&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;content van-ellipsis&quot;&gt;&#123;&#123; data.name &#125;&#125;&lt;/div&gt;</span><br><span class="line">    &lt;div</span><br><span class="line">      class=&quot;icon-box&quot;</span><br><span class="line">      @touchstart=&quot;handleTouchStart&quot;</span><br><span class="line">      @touchmove=&quot;handleTouchMove&quot;</span><br><span class="line">      @touchend=&quot;handleTouchEnd&quot;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;van-icon name=&quot;sort&quot; color=&quot;#e9e9e9&quot; size=&quot;24px&quot; /&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;style lang=&quot;scss&quot; scoped&gt;</span><br><span class="line">.item &#123;</span><br><span class="line">  height: 44px;</span><br><span class="line">  background-color: #fff;</span><br><span class="line">  justify-content: space-between;</span><br><span class="line">  align-items: center;</span><br><span class="line">  border-top: 1px solid #f2f2f2;</span><br><span class="line"></span><br><span class="line">  .content &#123;</span><br><span class="line">    flex: 1;</span><br><span class="line">    margin-left: 5px;</span><br><span class="line">  &#125;</span><br><span class="line">  .icon-box &#123;</span><br><span class="line">    width: 40px;</span><br><span class="line">    text-align: center;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">.move &#123;</span><br><span class="line">  position: relative;</span><br><span class="line">  z-index: 9;</span><br><span class="line">  box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.2), 0px -1px 10px rgba(0, 0, 0, 0.2);</span><br><span class="line">&#125;</span><br><span class="line">&lt;/style&gt;</span><br></pre></td></tr></table></figure>
+
+<p>当手指按下时给元素添加一个类名，用来响应用户操作，同时还需要记住当前按下的位置</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; ref, onMounted &#125; <span class="keyword">from</span> <span class="string">&quot;vue&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> props = defineProps&lt;&#123;</span><br><span class="line">  <span class="attr">data</span>: &#123; <span class="attr">ranking</span>: <span class="built_in">number</span>; <span class="attr">name</span>: <span class="built_in">string</span>; <span class="attr">id</span>: <span class="built_in">number</span> &#125;;</span><br><span class="line">&#125;&gt;();</span><br><span class="line"><span class="keyword">const</span> divEl = ref&lt;<span class="title class_">HTMLDivElement</span>&gt;();</span><br><span class="line"><span class="keyword">const</span> emit = defineEmits&lt;&#123;</span><br><span class="line">  <span class="attr">change</span>: [<span class="attr">data</span>: <span class="built_in">any</span>[]];</span><br><span class="line">&#125;&gt;();</span><br><span class="line"><span class="comment">// 本demo只涉及上下的排序，所以只变更Y轴的位置，更改Z轴是为了凸显目标元素</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">changePos</span> = (<span class="params">el: HTMLElement, y: <span class="built_in">number</span>, z: <span class="built_in">number</span> = <span class="number">10</span></span>) =&gt; &#123;</span><br><span class="line">  el.<span class="property">style</span>.<span class="title function_">setProperty</span>(<span class="string">&quot;transform&quot;</span>, <span class="string">`translate3d(0px,<span class="subst">$&#123;y&#125;</span>px,<span class="subst">$&#123;z&#125;</span>px)`</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> startY = <span class="number">0</span>,</span><br><span class="line">  distance = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleTouchStart</span> = (<span class="params">e: TouchEvent</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> el = divEl.<span class="property">value</span>!;</span><br><span class="line">  el.<span class="property">classList</span>.<span class="title function_">add</span>(<span class="string">&quot;move&quot;</span>);</span><br><span class="line">  startY = e.<span class="property">touches</span>[<span class="number">0</span>].<span class="property">clientY</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">raf</span> = (<span class="params">callback: (...args: <span class="built_in">any</span>[]) =&gt; <span class="built_in">any</span></span>) =&gt; &#123;</span><br><span class="line">  <span class="title function_">requestAnimationFrame</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">requestAnimationFrame</span>(callback);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>手指按下后随即移动，移动时触发 <strong>touchmove</strong> 事件，该事件完成进行修改元素的位置</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">handleTouchMove</span> = (<span class="params">e: TouchEvent</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> el = divEl.<span class="property">value</span>!;</span><br><span class="line">  <span class="comment">// 父级容器，用来更改元素的位置</span></span><br><span class="line">  <span class="keyword">const</span> parentEl = el.<span class="property">parentElement</span>;</span><br><span class="line">  <span class="comment">// 移动的位置</span></span><br><span class="line">  distance = e.<span class="property">touches</span>[<span class="number">0</span>].<span class="property">clientY</span> - startY;</span><br><span class="line">  <span class="comment">// 修改位置</span></span><br><span class="line">  <span class="title function_">changePos</span>(el, distance);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>实现了移动之后，再判断移动的方向，然后根据移动了多少距离判断是否需要变更位置</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 记录最后要更改位置的兄弟元素</span></span><br><span class="line"><span class="keyword">let</span> <span class="attr">changeEl</span>: <span class="title class_">HTMLDivElement</span> | <span class="literal">undefined</span> = <span class="literal">undefined</span>;</span><br><span class="line"><span class="comment">// 记录拖动的方向，最后用来决定是将目标元素往前插还是往后插</span></span><br><span class="line"><span class="keyword">let</span> <span class="attr">direction</span>: <span class="built_in">string</span> = <span class="string">&quot;up&quot;</span>;</span><br><span class="line"><span class="comment">// 拖动的距离超过目标元素的高才进行移动处理，留了10px的位置</span></span><br><span class="line"><span class="keyword">if</span> (<span class="title class_">Math</span>.<span class="title function_">abs</span>(distance) &gt;= el.<span class="property">offsetHeight</span> - <span class="number">10</span>) &#123;</span><br><span class="line">  <span class="comment">// 判断拖动的方向</span></span><br><span class="line">  <span class="keyword">if</span> (distance &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="comment">// 下一个元素</span></span><br><span class="line">    <span class="keyword">const</span> nextEl = el.<span class="property">nextElementSibling</span> <span class="keyword">as</span> <span class="title class_">HTMLDivElement</span>;</span><br><span class="line">    <span class="keyword">if</span> (nextEl) &#123;</span><br><span class="line">      changeEl = nextEl;</span><br><span class="line">      direction = <span class="string">&quot;down&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 前一个元素</span></span><br><span class="line">    <span class="keyword">const</span> prevEl = el.<span class="property">previousElementSibling</span> <span class="keyword">as</span> <span class="title class_">HTMLDivElement</span>;</span><br><span class="line">    <span class="keyword">if</span> (prevEl) &#123;</span><br><span class="line">      changeEl = prevEl;</span><br><span class="line">      direction = <span class="string">&quot;up&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (changeEl) &#123;</span><br><span class="line">    changeEl.<span class="property">style</span>.<span class="title function_">setProperty</span>(<span class="string">&quot;transition&quot;</span>, <span class="string">&quot;none&quot;</span>);</span><br><span class="line">    <span class="keyword">const</span> y = changeEl.<span class="property">offsetTop</span>;</span><br><span class="line">    <span class="title function_">changeRanking</span>(el, changeEl);</span><br><span class="line">    <span class="comment">// 如果是往下拖动需要将元素插到下一个同级元素的下一个之前，所以还需要获取一次nextElementSibling</span></span><br><span class="line">    <span class="keyword">const</span> targetEl =</span><br><span class="line">      direction === <span class="string">&quot;up&quot;</span> ? changeEl : changeEl.<span class="property">nextElementSibling</span>;</span><br><span class="line">    <span class="comment">// 将目标元素插入到对应的兄弟元素之前</span></span><br><span class="line">    parentEl?.<span class="title function_">insertBefore</span>(el, targetEl);</span><br><span class="line">    <span class="comment">// 利用flip动画的思想，修改兄弟元素的位置，以此实现动画</span></span><br><span class="line">    <span class="title function_">changePos</span>(changeEl, y - changeEl.<span class="property">offsetTop</span>);</span><br><span class="line">    <span class="comment">// 这个方法能让浏览器在绘制下一帧时执行</span></span><br><span class="line">    <span class="title function_">raf</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      changeEl!.<span class="property">style</span>.<span class="title function_">setProperty</span>(</span><br><span class="line">        <span class="string">&quot;transition&quot;</span>,</span><br><span class="line">        <span class="string">&quot;all 0.5s cubic-bezier(0.1, 0.8, 0.2, 1)&quot;</span></span><br><span class="line">      );</span><br><span class="line">      <span class="comment">// 恢复兄弟元素的位置，完成flip动画</span></span><br><span class="line">      <span class="title function_">changePos</span>(changeEl!, <span class="number">0</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 重置移动距离和开始位置</span></span><br><span class="line">    distance = <span class="number">0</span>;</span><br><span class="line">    startY = e.<span class="property">touches</span>[<span class="number">0</span>].<span class="property">clientY</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的 <strong>touchmove</strong> 事件</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">changeRanking</span> = (<span class="params">el1: HTMLDivElement, el2: HTMLDivElement</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> rank = el1.<span class="property">dataset</span>.<span class="property">ranking</span>;</span><br><span class="line">  el1.<span class="property">dataset</span>.<span class="property">ranking</span> = el2.<span class="property">dataset</span>.<span class="property">ranking</span>;</span><br><span class="line">  el2.<span class="property">dataset</span>.<span class="property">ranking</span> = rank;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleTouchMove</span> = (<span class="params">e: TouchEvent</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> el = divEl.<span class="property">value</span>!;</span><br><span class="line">  <span class="keyword">const</span> parentEl = el.<span class="property">parentElement</span>;</span><br><span class="line">  <span class="keyword">if</span> (!el.<span class="property">classList</span>.<span class="title function_">contains</span>(<span class="string">&quot;item&quot;</span>)) <span class="keyword">return</span>;</span><br><span class="line">  distance = e.<span class="property">touches</span>[<span class="number">0</span>].<span class="property">clientY</span> - startY;</span><br><span class="line">  <span class="keyword">let</span> <span class="attr">changeEl</span>: <span class="title class_">HTMLDivElement</span> | <span class="literal">undefined</span> = <span class="literal">undefined</span>;</span><br><span class="line">  <span class="keyword">let</span> <span class="attr">direction</span>: <span class="built_in">string</span> = <span class="string">&quot;up&quot;</span>;</span><br><span class="line">  <span class="keyword">if</span> (<span class="title class_">Math</span>.<span class="title function_">abs</span>(distance) &gt;= el.<span class="property">offsetHeight</span> - <span class="number">10</span>) &#123;</span><br><span class="line">    <span class="comment">// 判断拖动的方向</span></span><br><span class="line">    <span class="keyword">if</span> (distance &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> nextEl = el.<span class="property">nextElementSibling</span> <span class="keyword">as</span> <span class="title class_">HTMLDivElement</span>;</span><br><span class="line">      <span class="keyword">if</span> (nextEl) &#123;</span><br><span class="line">        changeEl = nextEl;</span><br><span class="line">        direction = <span class="string">&quot;down&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> prevEl = el.<span class="property">previousElementSibling</span> <span class="keyword">as</span> <span class="title class_">HTMLDivElement</span>;</span><br><span class="line">      <span class="keyword">if</span> (prevEl) &#123;</span><br><span class="line">        changeEl = prevEl;</span><br><span class="line">        direction = <span class="string">&quot;up&quot;</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (changeEl) &#123;</span><br><span class="line">      changeEl.<span class="property">style</span>.<span class="title function_">setProperty</span>(<span class="string">&quot;transition&quot;</span>, <span class="string">&quot;none&quot;</span>);</span><br><span class="line">      <span class="keyword">const</span> y = changeEl.<span class="property">offsetTop</span>;</span><br><span class="line">      <span class="comment">// 实现真正排序的核心原理</span></span><br><span class="line">      <span class="title function_">changeRanking</span>(el, changeEl);</span><br><span class="line">      <span class="keyword">const</span> targetEl =</span><br><span class="line">        direction === <span class="string">&quot;up&quot;</span> ? changeEl : changeEl.<span class="property">nextElementSibling</span>;</span><br><span class="line">      parentEl?.<span class="title function_">insertBefore</span>(el, targetEl);</span><br><span class="line">      <span class="title function_">changePos</span>(changeEl, y - changeEl.<span class="property">offsetTop</span>);</span><br><span class="line">      <span class="title function_">raf</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        changeEl!.<span class="property">style</span>.<span class="title function_">setProperty</span>(</span><br><span class="line">          <span class="string">&quot;transition&quot;</span>,</span><br><span class="line">          <span class="string">&quot;all 0.5s cubic-bezier(0.1, 0.8, 0.2, 1)&quot;</span></span><br><span class="line">        );</span><br><span class="line">        <span class="title function_">changePos</span>(changeEl!, <span class="number">0</span>);</span><br><span class="line">      &#125;);</span><br><span class="line">      distance = <span class="number">0</span>;</span><br><span class="line">      startY = e.<span class="property">touches</span>[<span class="number">0</span>].<span class="property">clientY</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">changePos</span>(el, distance);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>至此完成了拖动排序，但是这样只是完成了 <strong>dom</strong> 树的排序，对于 <strong>vue</strong> 渲染模版所用的数据而言没有丝毫改变，对此我使用的方式是给标签增加属性 <strong>ranking</strong> 和 <strong>id</strong>，但是直接编写的话，<strong>vue</strong> 在进行 <strong>diff</strong> 虚拟 <strong>dom</strong> 时会因为每次移动都不同的 <strong>ranking</strong> 属性而重新生成虚拟 <strong>dom</strong>,所以我选择在元素挂载后再设置 <strong>dataset</strong></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">onMounted</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (divEl.<span class="property">value</span>) &#123;</span><br><span class="line">    divEl.<span class="property">value</span>.<span class="property">dataset</span>.<span class="property">ranking</span> = props.<span class="property">data</span>.<span class="property">ranking</span> + <span class="string">&quot;&quot;</span>;</span><br><span class="line">    divEl.<span class="property">value</span>.<span class="property">dataset</span>.<span class="property">id</span> = props.<span class="property">data</span>.<span class="property">id</span> + <span class="string">&quot;&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="完成排序"><a href="#完成排序" class="headerlink" title="完成排序"></a>完成排序</h2><p>在排序好 <strong>dom</strong> 树时只需要在松开手指后将修改后的 <strong>id</strong> 与 <strong>ranking</strong> 返回给父组件即可，在父组件更新用于渲染的数据，此时由于我没有在虚拟 <strong>dom</strong> 中使用 <strong>ranking</strong> 而 <strong>id</strong> 没有变化，所以虚拟 <strong>dom</strong> 也不会重新生成</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 子组件 touchend 事件</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleTouchEnd</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> el = divEl.<span class="property">value</span>!;</span><br><span class="line">  el.<span class="property">classList</span>.<span class="title function_">remove</span>(<span class="string">&quot;move&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="attr">result</span>: <span class="built_in">any</span>[] = [];</span><br><span class="line">  <span class="comment">// 拿到所有的 ranking和id</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> el.<span class="property">parentElement</span>!.<span class="property">children</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> dataset = (item <span class="keyword">as</span> <span class="title class_">HTMLDivElement</span>).<span class="property">dataset</span>;</span><br><span class="line">    <span class="keyword">if</span> (dataset) &#123;</span><br><span class="line">      result.<span class="title function_">push</span>(&#123; <span class="attr">ranking</span>: dataset.<span class="property">ranking</span>, <span class="attr">id</span>: dataset.<span class="property">id</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 重置拖动元素的位置</span></span><br><span class="line">  <span class="title function_">changePos</span>(el, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="title function_">emit</span>(<span class="string">&quot;change&quot;</span>, result);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 父组件修改元数据</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleChange</span> = (<span class="params">data: <span class="built_in">any</span>[]</span>) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 将排序结果修改进原数组</span></span><br><span class="line">  data.<span class="title function_">forEach</span>(<span class="function">(<span class="params">item: <span class="built_in">any</span></span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">type</span> = list.<span class="title function_">find</span>(<span class="function">(<span class="params">i: <span class="built_in">any</span></span>) =&gt;</span> i.<span class="property">id</span> === +item.<span class="property">id</span>);</span><br><span class="line">    <span class="keyword">type</span>.<span class="property">ranking</span> = +item.<span class="property">ranking</span>;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>第一步记录位置，第二步修改位置，第三步找到目标元素要去的位置的后一个兄弟元素，第四步将目标元素 <strong>父元素.insertBefore</strong> 到找到的兄弟元素之前，第五步统计修改后的数据，发送给父组件修改元数据</p>
+<p><img src="https://gitee.com/jiumuri/images/raw/master/PicGo-updata-img/202401011905436.png" alt="image-20240101190537349" loading="lazy" onerror='this.onerror=null;this.src="/img/404.jpg"'></p>
+
+</article>
+    
+    
+
+</div>
+<div class="trm-post-next-prev row">
+    <div class="col-lg-12">
+        <!-- title -->
+        <h5 class="trm-title-with-divider">
+            其他文章
+            <span data-number="02"></span>
+        </h5>
+    </div>
+    
+    
+        <div class="col-lg-6">
+    <div class="trm-blog-card trm-scroll-animation">
+        <a href="/2023/12/31/%E7%AC%94%E8%AE%B0/%E5%85%B3%E4%BA%8EReact%E5%92%8CVue3%E4%B8%AD%E5%B0%81%E8%A3%85%E9%80%9A%E7%94%A8%E7%BB%84%E4%BB%B6%E7%9A%84%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95/" class="trm-cover-frame trm-anima-link">
+            
+            
+                <img alt="cover" class="no-fancybox" src="/img/bg1.jpg">
+            
+        </a>
+        
+        <div class="trm-card-descr">
+            <div class="trm-label trm-category trm-mb-20">
+                <a href=" /categories/%E7%AC%94%E8%AE%B0/">
+                    笔记
+                </a>
+            </div>
+            <h5>
+                <a href="/2023/12/31/%E7%AC%94%E8%AE%B0/%E5%85%B3%E4%BA%8EReact%E5%92%8CVue3%E4%B8%AD%E5%B0%81%E8%A3%85%E9%80%9A%E7%94%A8%E7%BB%84%E4%BB%B6%E7%9A%84%E4%B8%80%E4%BA%9B%E6%83%B3%E6%B3%95/" class="trm-anima-link">
+                    关于React和Vue3中封装通用组件的一些想法
+                </a>
+            </h5>
+            <div class="trm-divider trm-mb-20 trm-mt-20"></div>
+            <ul class="trm-card-data trm-label">
+                <li>23/12/31</li>
+                <li>11:07</li>
+                
+                
+            </ul>
+        </div>
+    </div>
+</div>
+    
+</div>
+
+    
+
+
+
+                    <div class="trm-divider footer-divider"></div>
+
+                    <!-- footer -->
+                    <footer class="trm-scroll-animation">
+
+    
+
+    
+
+    
+        <div class="trm-footer-item">
+            <span>
+                由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v6.3.0
+            </span>
+            <span class="footer-separator" data-separator=" | "></span>
+            <span> 
+                主题 - 
+                <a rel="noopener" href='https://github.com/MaLuns/hexo-theme-async' target='_blank'>Async</a>
+                v2.1.2
+            </span>
+        </div>
+      
+
+     
+
+     
+</footer>
+ 
+                    <!-- footer end -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- body end -->
+
+            
+
+    <div id="post-toc" class="trm-post-toc">
+      <div class="trm-post-toc-header">
+        目录导航
+      </div>
+      <div class="trm-post-toc-content">
+        <ol class="trm-toc"><li class="trm-toc-item trm-toc-level-1"><a rel="nofollow" class="trm-toc-link" href="#移动端网页元素拖拽排序"><span class="trm-toc-number">1.</span> <span class="trm-toc-text">移动端网页元素拖拽排序</span></a><ol class="trm-toc-child"><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#让元素移动"><span class="trm-toc-number">1.1.</span> <span class="trm-toc-text">让元素移动</span></a></li><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#完成排序"><span class="trm-toc-number">1.2.</span> <span class="trm-toc-text">完成排序</span></a></li><li class="trm-toc-item trm-toc-level-2"><a rel="nofollow" class="trm-toc-link" href="#总结"><span class="trm-toc-number">1.3.</span> <span class="trm-toc-text">总结</span></a></li></ol></li></ol>
+      </div>
+    </div>
+
+            
+<div class="trm-fixed-container">
+    
+        <div class="trm-fixed-btn post-toc-btn" data-title="目录">
+            <i class="iconfont fas fa-th-list"></i>
+        </div>
+    
+    
+        <div class="trm-fixed-btn" data-title="阅读模式" onclick="asyncFun.switchReadMode()">
+            <i class="iconfont fas fa-book-reader"></i>
+        </div>
+    
+    
+    <div id="trm-back-top" class="trm-fixed-btn" data-title="回到顶部">
+        <i class="iconfont fas fa-arrow-up"></i>
+    </div>
+</div>
+        </div>
+      </div>
+      <!-- scroll container end -->
+  </div>
+  <!-- app wrapper end -->
+
+  
+    <div class="trm-search-popup">
+        <div class="trm-search-wrapper">
+            <div class="form trm-search-form">
+                <div class="trm-search-input-icon">
+                    <i class="iconfont fas fa-search"></i>
+                </div>
+                <input class="trm-search-input" type="text" placeholder="搜索文章...">
+                <div class="trm-search-btn-close">
+                    <i class="iconfont fas fa-times"></i>
+                </div>
+            </div>
+            <div class="trm-search-result-container">
+                <div class="trm-search-empty">
+                    请输入关键词进行搜索
+                </div>
+            </div>
+            <div class="trm-search-footer">
+                <div class="trm-search-stats"></div>
+                <ul class="trm-search-commands">
+                    <li>
+                        <kbd class="command-palette-commands-key">
+                            <svg width="15" height="15" aria-label="Escape key" role="img">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.2">
+                                    <path
+                                        d="M13.6167 8.936c-.1065.3583-.6883.962-1.4875.962-.7993 0-1.653-.9165-1.653-2.1258v-.5678c0-1.2548.7896-2.1016 1.653-2.1016.8634 0 1.3601.4778 1.4875 1.0724M9 6c-.1352-.4735-.7506-.9219-1.46-.8972-.7092.0246-1.344.57-1.344 1.2166s.4198.8812 1.3445.9805C8.465 7.3992 8.968 7.9337 9 8.5c.032.5663-.454 1.398-1.4595 1.398C6.6593 9.898 6 9 5.963 8.4851m-1.4748.5368c-.2635.5941-.8099.876-1.5443.876s-1.7073-.6248-1.7073-2.204v-.4603c0-1.0416.721-2.131 1.7073-2.131.9864 0 1.6425 1.031 1.5443 2.2492h-2.956">
+                                    </path>
+                                </g>
+                            </svg>
+                        </kbd>
+                        <span class="command-palette-Label">to close</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+  <!-- Plugin -->
+
+
+
+
+    
+    
+<script src="https://unpkg.com/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+
+    
+
+    
+        <script src="/js/plugins/typing.js?v=2.1.2"></script>
+    
+
+    
+        
+<script src="https://unpkg.com/hexo-generator-searchdb@1.4.0/dist/search.js"></script>
+
+        <script src="/js/plugins/local_search.js?v=2.1.2"></script>
+    
+
+    <!-- 数学公式 -->
+    
+
+    <!-- 评论插件 -->
+    
+        
+
+        
+    
+
+
+
+<!-- CDN -->
+
+
+    
+
+    
+
+    
+
+
+
+
+    <!-- Service Worker -->
+    
+    <!-- baidu push -->
+    
+
+
+<script id="async-script" src="/js/main.js?v=2.1.2"></script>
+
+</body>
+
+</html>
